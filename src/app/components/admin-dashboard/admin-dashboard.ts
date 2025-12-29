@@ -220,9 +220,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const formVal = this.arrangementForm.value;
+    const formVal = this.arrangementForm.getRawValue();
     const speaker = this.speakers().find(s => s.id === formVal.speakerId);
-    const title = this.titles().find(t => t.number === formVal.conferenceNumber);
+    
+    // Ensure we handle conferenceNumber as a number for strict comparison
+    const talkNum = formVal.conferenceNumber ? Number(formVal.conferenceNumber) : null;
+    const title = this.titles().find(t => t.number === talkNum);
     
     const arrangementData: any = {
       date: formVal.date,
@@ -232,7 +235,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       speakerName: formVal.type === 'event' ? '' : speaker?.name || '',
       speakerCongregation: formVal.type === 'event' ? '' : speaker?.congregation || '',
       conferenceTitle: formVal.type === 'event' ? formVal.customLabel : (title?.title || ''),
-      conferenceNumber: formVal.conferenceNumber || null,
+      conferenceNumber: talkNum,
       songNumber: formVal.songNumber || null,
       songTitle: formVal.songTitle || '',
       location: formVal.location || '',
