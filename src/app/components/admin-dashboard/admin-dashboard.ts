@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ThemeToggleComponent, RouterModule, DatePipe],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ThemeToggleComponent, RouterModule],
   templateUrl: './admin-dashboard.html'
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
@@ -49,6 +49,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   // New Workflow Signals
   selectedCongreFilter = signal<string>('');
   desiredTalkNumber = signal<number | null>(null);
+  
+  // Authentication Signal
+  isAuthorized = signal(false);
+  adminPassword = '';
   
   validationError = signal('');
 
@@ -88,6 +92,29 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       number: [null, [Validators.required, Validators.min(1)]],
       title: ['', Validators.required]
     });
+
+    // Check auth on load
+    const auth = localStorage.getItem('admin_auth');
+    if (auth === 'true') {
+      this.isAuthorized.set(true);
+    }
+  }
+
+  checkPassword() {
+    // Definimos una clave sencilla, por defecto "admin123"
+    // El usuario puede cambiarla aquí fácilmente.
+    if (this.adminPassword === 'admin123') {
+      this.isAuthorized.set(true);
+      localStorage.setItem('admin_auth', 'true');
+      this.validationError.set('');
+    } else {
+      this.validationError.set('Contraseña incorrecta');
+    }
+  }
+
+  logout() {
+    this.isAuthorized.set(false);
+    localStorage.removeItem('admin_auth');
   }
 
   ngOnInit() {

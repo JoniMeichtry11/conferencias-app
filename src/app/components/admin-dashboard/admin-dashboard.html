@@ -9,6 +9,9 @@
     </div>
     <div class="flex items-center gap-2 sm:gap-4">
       <app-theme-toggle></app-theme-toggle>
+      <button *ngIf="isAuthorized()" (click)="logout()" class="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all shadow-sm border border-red-100 dark:border-red-900/30" title="Cerrar Sesión">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+      </button>
       <a routerLink="/" class="group flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-semibold text-[#0054a6] dark:text-[#4a9eff] hover:text-[#003d7a] dark:hover:text-[#6bb3ff] hover:bg-[#e6f2ff] dark:hover:bg-[#1a3d66] transition-all duration-200">
         <svg class="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
@@ -20,7 +23,37 @@
 
   <!-- Content -->
   <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-20">
-    <!-- Tabs -->
+    
+    <!-- Login Screen -->
+    <div *ngIf="!isAuthorized()" class="flex flex-col items-center justify-center py-20 animate-in fade-in zoom-in duration-500">
+      <div class="bg-white dark:bg-[#1a1a1a] p-8 sm:p-12 rounded-[2.5rem] border-2 border-[#e5e7eb] dark:border-[#333333] shadow-2xl w-full max-w-md text-center">
+        <div class="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-3xl flex items-center justify-center text-[#0054a6] dark:text-[#4a9eff] mx-auto mb-6">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+        </div>
+        <h2 class="text-2xl font-black text-[#1a1a1a] dark:text-white mb-2 tracking-tight">Acceso Restringido</h2>
+        <p class="text-sm text-[#666666] dark:text-[#999999] mb-8 font-medium">Ingresa la clave de administrador para continuar.</p>
+        
+        <div class="space-y-4">
+          <input 
+            type="password" 
+            [(ngModel)]="adminPassword" 
+            (keyup.enter)="checkPassword()"
+            placeholder="Contraseña" 
+            class="w-full px-6 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-center font-bold text-[#1a1a1a] dark:text-white"
+          >
+          <div *ngIf="validationError()" class="text-red-500 text-xs font-bold animate-bounce">{{ validationError() }}</div>
+          <button 
+            (click)="checkPassword()" 
+            class="w-full py-4 bg-[#0054a6] dark:bg-[#4a9eff] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
+          >
+            Entrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngIf="isAuthorized()">
+      <!-- Tabs -->
     <div class="flex gap-2 mb-8 bg-[#f5f5f5] dark:bg-[#262626] p-1.5 rounded-xl w-full sm:w-fit border border-[#e0e0e0] dark:border-[#333333] overflow-x-auto">
       <button (click)="setTab('arrangements')" [class]="activeTab() === 'arrangements' ? 'bg-white dark:bg-[#333333] text-[#0054a6] dark:text-[#4a9eff] shadow-sm' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-[#f5f5f5]'" class="px-4 py-2.5 rounded-lg font-semibold text-sm whitespace-nowrap transition-all cursor-pointer">Arreglos</button>
       <button (click)="setTab('speakers')" [class]="activeTab() === 'speakers' ? 'bg-white dark:bg-[#333333] text-[#0054a6] dark:text-[#4a9eff] shadow-sm' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-[#f5f5f5]'" class="px-4 py-2.5 rounded-lg font-semibold text-sm whitespace-nowrap transition-all cursor-pointer">Oradores</button>
@@ -279,7 +312,6 @@
         </div>
       </div>
     </div>
-  </main>
 
   <!-- --- MODAL --- -->
   <div *ngIf="showModal()" 
@@ -493,7 +525,9 @@
           </div>
         </form>
 
+        </div>
       </div>
     </div>
-  </div>
+    </ng-container>
+  </main>
 </div>
