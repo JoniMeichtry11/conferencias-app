@@ -1,20 +1,46 @@
 import { Component, OnInit, inject, OnDestroy, signal, computed } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Arrangement, Speaker, NeighborCongregation, ConferenceTitle } from '../../core/models/conference.models';
-import { ThemeToggleComponent } from '../theme-toggle/theme-toggle';
+import { AdminNavbarComponent } from './components/admin-navbar';
+import { AdminLoginComponent } from './components/admin-login';
+import { ArrangementsTableComponent } from './components/arrangements-table';
+import { SpeakersGridComponent } from './components/speakers-grid';
+import { NeighborsGridComponent } from './components/neighbors-grid';
+import { TitlesTableComponent } from './components/titles-table';
+import { ArrangementFormComponent } from './components/arrangement-form';
+import { SpeakerFormComponent } from './components/speaker-form';
+import { NeighborFormComponent } from './components/neighbor-form';
+import { TitleFormComponent } from './components/title-form';
+import { AdminTabsComponent } from './components/admin-tabs';
 import { ThemeService } from '../../core/services/theme.service';
 import { ConferenceService } from '../../core/services/conference.service';
-import { SONGS_DATA } from '../../core/data/song-data';
 import { FormsModule } from '@angular/forms';
+import { SONGS_DATA } from '../../core/data/song-data';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ThemeToggleComponent, RouterModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    FormsModule, 
+    RouterModule,
+    AdminNavbarComponent,
+    AdminLoginComponent,
+    ArrangementsTableComponent,
+    SpeakersGridComponent,
+    NeighborsGridComponent,
+    TitlesTableComponent,
+    ArrangementFormComponent,
+    SpeakerFormComponent,
+    NeighborFormComponent,
+    TitleFormComponent,
+    AdminTabsComponent
+  ],
   templateUrl: './admin-dashboard.html'
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
