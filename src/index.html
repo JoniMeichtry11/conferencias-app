@@ -1,13 +1,49 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
   <title>ConferenciasApp</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="72x72" href="assets/icons/favicon-72.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/icons/favicon-96.png">
+  <link rel="icon" type="image/png" sizes="144x144" href="assets/icons/favicon-144.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/favicon-192.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="assets/icons/favicon-256.png">
+  <link rel="icon" type="image/png" sizes="384x384" href="assets/icons/favicon-384.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/favicon-512.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <script>
+    // Initialize theme before Angular renders to prevent flash
+    (function() {
+      const themeKey = 'conferencias-app-theme';
+      const savedTheme = localStorage.getItem(themeKey);
+      
+      // Only apply saved theme, default to light if none saved
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        // Default to light mode (no class needed)
+        document.documentElement.classList.remove('dark');
+        if (savedTheme === 'light' || !savedTheme) {
+          document.documentElement.removeAttribute('data-theme');
+        }
+      }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>
+  <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>
 </html>

@@ -1,0 +1,340 @@
+<div class="min-h-screen bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-sm border-b border-[#e0e0e0] dark:border-[#333333] px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm transition-colors duration-300">
+    <div class="flex items-center gap-3 sm:gap-4">
+      <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-[#0054a6] dark:bg-[#4a9eff] flex items-center justify-center text-white shadow-md transition-all hover:scale-105">
+        <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M4 13h6a1 1 0 001-1V4a1 1 0 00-1-1H4a1 1 0 00-1 1v8a1 1 0 001 1zm-1 7a1 1 0 001 1h6a1 1 0 001-1v-4a1 1 0 00-1-1H4a1 1 0 00-1 1v4zm10 0a1 1 0 001 1h6a1 1 0 001-1v-7a1 1 0 00-1-1h-6a1 1 0 00-1 1v7zm1-10h6a1 1 0 001-1V4a1 1 0 00-1-1h-6a1 1 0 00-1 1v5a1 1 0 001 1z"/></svg>
+      </div>
+      <h1 class="text-xl sm:text-2xl font-semibold text-[#1a1a1a] dark:text-[#f5f5f5] tracking-tight">Panel de Administración</h1>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-4">
+      <app-theme-toggle></app-theme-toggle>
+      <a routerLink="/" class="group flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-semibold text-[#0054a6] dark:text-[#4a9eff] hover:text-[#003d7a] dark:hover:text-[#6bb3ff] hover:bg-[#e6f2ff] dark:hover:bg-[#1a3d66] transition-all duration-200">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+        </svg>
+        <span class="hidden sm:inline">Volver</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-20">
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-8 bg-[#f5f5f5] dark:bg-[#262626] p-1.5 rounded-xl w-full sm:w-fit border border-[#e0e0e0] dark:border-[#333333] overflow-x-auto">
+      <button (click)="activeTab = 'arrangements'" [class]="activeTab === 'arrangements' ? 'bg-white dark:bg-[#333333] text-[#0054a6] dark:text-[#4a9eff] shadow-sm' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-[#f5f5f5]'" class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base whitespace-nowrap transition-all cursor-pointer">Arreglos</button>
+      <button (click)="activeTab = 'speakers'" [class]="activeTab === 'speakers' ? 'bg-white dark:bg-[#333333] text-[#0054a6] dark:text-[#4a9eff] shadow-sm' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-[#f5f5f5]'" class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base whitespace-nowrap transition-all cursor-pointer">Oradores</button>
+      <button (click)="activeTab = 'neighbors'" [class]="activeTab === 'neighbors' ? 'bg-white dark:bg-[#333333] text-[#0054a6] dark:text-[#4a9eff] shadow-sm' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-[#f5f5f5]'" class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base whitespace-nowrap transition-all cursor-pointer">Congregaciones</button>
+    </div>
+
+    <!-- Arrangements List -->
+    <div *ngIf="activeTab === 'arrangements'">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-black text-[#1a1a1a] dark:text-[#f5f5f5] tracking-tight">Lista de Conferencias</h2>
+          <p class="text-sm sm:text-base text-[#555555] dark:text-[#aaaaaa] mt-0.5">Gestión de conferencias entrantes y salientes.</p>
+        </div>
+        <button (click)="openAddModal()" class="flex items-center gap-2.5 bg-[#0054a6] dark:bg-[#4a9eff] text-white px-5 sm:px-6 py-3 rounded-2xl font-black hover:bg-[#003d7a] dark:hover:bg-[#6bb3ff] transition-all shadow-xl shadow-blue-500/10 active:scale-95 text-sm w-full sm:w-auto justify-center cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Nueva Conferencia</span>
+        </button>
+      </div>
+
+      <!-- Filters & Search -->
+      <div class="flex flex-col md:flex-row gap-4 mb-8">
+        <div class="flex-1 relative group">
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#999999] group-focus-within:text-[#0054a6] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            placeholder="Buscar por orador, título o congregación..." 
+            class="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white"
+          >
+        </div>
+        
+        <div class="flex gap-4">
+          <select 
+            [(ngModel)]="filterType"
+            class="px-5 py-3.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white appearance-none cursor-pointer min-w-[140px]"
+          >
+            <option value="all">Todos los tipos</option>
+            <option value="incoming">Visitas</option>
+            <option value="outgoing">Salidas</option>
+            <option value="event">Eventos</option>
+          </select>
+
+          <button 
+            (click)="toggleSort()"
+            class="p-3.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl hover:border-[#0054a6] transition-all flex items-center gap-2 group"
+          >
+            <svg class="w-5 h-5 text-[#555555] dark:text-[#aaaaaa] group-hover:text-[#0054a6] transition-transform" [class.rotate-180]="sortOrder === 'desc'" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+            <span class="text-xs font-black text-[#555555] dark:text-[#aaaaaa] uppercase tracking-widest hidden sm:inline">{{ sortOrder === 'asc' ? 'Recientes' : 'Antiguos' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop Table View -->
+      <div class="hidden lg:block overflow-hidden bg-white dark:bg-[#1a1a1a] rounded-4xl border border-[#e5e7eb] dark:border-[#333333] shadow-xl">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-[#f8f9fa] dark:bg-[#262626] border-b border-[#e5e7eb] dark:border-[#333333]">
+              <th class="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Fecha</th>
+              <th class="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Arreglo</th>
+              <th class="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Orador / Congre</th>
+              <th class="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Título Conferencia</th>
+              <th class="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa] text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e5e7eb] dark:divide-[#333333]">
+            <tr *ngFor="let arr of filteredArrangements" class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+              <td class="px-6 py-5">
+                <div class="flex flex-col">
+                  <span class="text-[10px] font-bold text-[#0054a6] dark:text-[#4a9eff] uppercase tracking-wider mb-0.5">{{ arr.date | date:'EEE' }}</span>
+                  <span class="text-sm font-black text-[#1a1a1a] dark:text-white">{{ arr.date | date:'d MMM' }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <span [ngClass]="{
+                  'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': arr.type === 'incoming',
+                  'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': arr.type === 'outgoing',
+                  'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': arr.type === 'event'
+                }" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border border-current/10">
+                  {{ arr.type === 'incoming' ? 'Visita' : arr.type === 'outgoing' ? 'Salida' : 'Evento' }}
+                </span>
+              </td>
+              <td class="px-6 py-5 min-w-[180px]">
+                @if (arr.type !== 'event') {
+                  <div class="flex flex-col">
+                    <span class="text-sm font-black text-[#1a1a1a] dark:text-white">{{ arr.speakerName }}</span>
+                    <span class="text-xs text-[#555555] dark:text-[#aaaaaa]">{{ arr.speakerCongregation }}</span>
+                  </div>
+                } @else {
+                  <span class="text-sm italic text-[#555555] dark:text-[#aaaaaa]">-</span>
+                }
+              </td>
+              <td class="px-6 py-5 max-w-[300px]">
+                <div class="flex flex-col gap-1">
+                  @if (arr.conferenceNumber) {
+                    <span class="text-[9px] font-black text-[#16a34a] dark:text-[#4ade80] uppercase">Conferencia #{{ arr.conferenceNumber }}</span>
+                  }
+                  <p class="text-sm font-bold text-[#1a1a1a] dark:text-white line-clamp-2 leading-tight italic">{{ arr.conferenceTitle }}</p>
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <div class="flex items-center justify-center gap-2">
+                  <button (click)="editArrangement(arr)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-[#0054a6] hover:text-white dark:hover:bg-[#4a9eff] dark:hover:text-white transition-all hover:scale-110 active:scale-95 cursor-pointer" title="Editar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  </button>
+                  <button (click)="shareWhatsApp(arr)" class="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all hover:scale-110 active:scale-95 cursor-copy" title="Compartir">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                  </button>
+                  <button (click)="deleteArrangement(arr.id)" class="p-2.5 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white transition-all hover:scale-110 active:scale-95 cursor-pointer" title="Eliminar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile/Tablet Card View (Existing layout refined) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-6">
+        <div *ngFor="let arr of filteredArrangements" class="bg-white dark:bg-[#1a1a1a] rounded-4xl p-6 sm:p-8 border border-[#e5e7eb] dark:border-[#333333] shadow-lg relative group overflow-hidden transition-all hover:shadow-xl hover:border-[#0054a6] dark:hover:border-[#4a9eff]">
+          <!-- Type Indicator Stripe -->
+          <div [ngClass]="{
+            'bg-[#0054a6]': arr.type === 'incoming',
+            'bg-[#d97706]': arr.type === 'outgoing',
+            'bg-[#10b981]': arr.type === 'event'
+          }" class="absolute top-0 left-0 w-2 h-full z-20"></div>
+          
+          <div class="relative z-10">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div class="flex flex-col">
+                <span class="text-[10px] font-black text-[#0054a6] dark:text-[#4a9eff] uppercase tracking-[0.2em] mb-1">
+                  {{ arr.date | date:'EEEE' }}
+                </span>
+                <h4 class="text-xl font-black text-[#1a1a1a] dark:text-white tracking-tight">
+                  {{ arr.date | date:'d' }} <span class="text-sm font-normal opacity-60">de {{ arr.date | date:'MMMM' }}</span>
+                </h4>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <span [ngClass]="{
+                  'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': arr.type === 'incoming',
+                  'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': arr.type === 'outgoing',
+                  'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': arr.type === 'event'
+                }" class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-current/10">
+                  {{ arr.type === 'incoming' ? 'Visita' : arr.type === 'outgoing' ? 'Salida' : 'Evento' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <!-- Talk Info -->
+              <div class="p-5 rounded-3xl bg-[#f9fafb] dark:bg-[#262626] border border-[#e5e7eb] dark:border-[#333333]">
+                <div class="flex items-center gap-3 mb-2.5">
+                  <span class="text-[9px] font-black text-[#0054a6] dark:text-[#4a9eff] uppercase tracking-widest bg-white dark:bg-[#1a1a1a] px-2 py-1 rounded-lg border border-[#e5e7eb] dark:border-[#333333]">
+                    #{{ arr.conferenceNumber }}
+                  </span>
+                  @if (arr.songNumber) {
+                    <span class="text-[9px] font-black text-[#d97706] dark:text-[#fbbf24] uppercase tracking-widest bg-white dark:bg-[#1a1a1a] px-2 py-1 rounded-lg border border-[#e5e7eb] dark:border-[#333333]">
+                      🎵 {{ arr.songNumber }}
+                    </span>
+                  }
+                </div>
+                <h3 class="text-xl font-black text-[#1a1a1a] dark:text-white leading-tight italic">{{ arr.conferenceTitle }}</h3>
+              </div>
+
+              <!-- Orador -->
+              @if (arr.type !== 'event') {
+                <div class="flex items-center gap-4 pl-1">
+                  <div class="w-11 h-11 rounded-2xl bg-white dark:bg-[#262626] border border-[#e5e7eb] dark:border-[#333333] flex items-center justify-center text-[#0054a6] dark:text-[#4a9eff] shrink-0 shadow-sm">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-black text-[#1a1a1a] dark:text-white truncate">{{ arr.speakerName }}</p>
+                    <p class="text-xs font-bold text-[#555555] dark:text-[#aaaaaa] truncate">{{ arr.speakerCongregation }}</p>
+                  </div>
+                </div>
+              }
+
+              <!-- Actions -->
+              <div class="grid grid-cols-3 gap-3 pt-6 border-t border-[#e5e7eb] dark:border-[#333333]">
+                <button (click)="editArrangement(arr)" class="flex items-center justify-center gap-2 bg-[#f3f4f6] dark:bg-[#262626] hover:bg-[#0054a6] hover:text-white dark:hover:bg-[#4a9eff] dark:hover:text-white text-[#1a1a1a] dark:text-white text-xs font-black py-4 rounded-xl transition-all active:scale-95">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  <span class="hidden sm:inline">Editar</span>
+                </button>
+                <button (click)="shareWhatsApp(arr)" class="flex items-center justify-center bg-[#25d366] hover:bg-[#128c7e] text-white py-4 rounded-xl transition-all shadow-lg shadow-[#25d366]/20 active:scale-95">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                </button>
+                <button (click)="deleteArrangement(arr.id)" class="flex items-center justify-center bg-red-50 dark:bg-red-900/20 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 text-red-600 dark:text-red-400 py-4 rounded-xl transition-all active:scale-95">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  <span class="hidden sm:inline">Eliminar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals & Placeholder Tabs -->
+    <div *ngIf="activeTab === 'speakers'" class="py-32 text-center bg-white dark:bg-[#262626] rounded-2xl border border-[#e0e0e0] dark:border-[#333333] shadow-sm">
+      <div class="text-8xl mb-6 opacity-20">🎤</div>
+      <h3 class="text-2xl font-semibold text-[#1a1a1a] dark:text-[#f5f5f5]">Gestión de Oradores</h3>
+      <p class="text-lg text-[#666666] dark:text-[#999999] mt-3">Próximamente...</p>
+    </div>
+    
+    <div *ngIf="activeTab === 'neighbors'" class="py-32 text-center bg-white dark:bg-[#262626] rounded-2xl border border-[#e0e0e0] dark:border-[#333333] shadow-sm">
+      <div class="text-8xl mb-6 opacity-20">🏛️</div>
+      <h3 class="text-2xl font-semibold text-[#1a1a1a] dark:text-[#f5f5f5]">Congregaciones Vecinas</h3>
+      <p class="text-lg text-[#666666] dark:text-[#999999] mt-3">Próximamente...</p>
+    </div>
+  </main>
+
+  <!-- Modal Form -->
+  <div *ngIf="showModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm transition-all">
+    <div class="bg-white dark:bg-[#262626] rounded-t-2xl sm:rounded-2xl w-full max-w-2xl shadow-xl overflow-y-auto max-h-[90vh] border-t sm:border border-[#e0e0e0] dark:border-[#333333]">
+      <div class="p-6 sm:p-8">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl sm:text-3xl font-semibold text-[#1a1a1a] dark:text-[#f5f5f5]">{{ editingArrangement ? 'Editar Conferencia' : 'Nueva Conferencia' }}</h2>
+          <button (click)="showModal = false" class="p-2 transition-colors text-[#999999] hover:text-[#dc2626] hover:bg-[#fee2e2] dark:hover:bg-[#991b1b]/20 rounded-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form [formGroup]="arrangementForm" (ngSubmit)="saveArrangement()" class="space-y-5 sm:space-y-6">
+          <div *ngIf="validationError" class="p-4 bg-[#fee2e2] dark:bg-[#991b1b]/20 border border-[#fecaca] dark:border-[#991b1b] rounded-xl text-[#dc2626] dark:text-[#f87171] text-base font-medium flex items-center gap-2">
+             <svg class="w-5 h-5" fill="currentcolor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+            {{ validationError }}
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Fecha</label>
+              <input type="date" formControlName="date" class="w-full p-3 sm:p-4 bg-[#f5f5f5] dark:bg-[#333333] rounded-lg border border-[#e0e0e0] dark:border-[#404040] focus:border-[#0054a6] dark:focus:border-[#4a9eff] focus:ring-1 focus:ring-[#0054a6] dark:focus:ring-[#4a9eff] outline-none font-medium text-base text-[#1a1a1a] dark:text-[#f5f5f5] transition-all">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Horario</label>
+              <input type="text" formControlName="time" class="w-full p-3 sm:p-4 bg-[#f5f5f5] dark:bg-[#333333] rounded-lg border border-[#e0e0e0] dark:border-[#404040] focus:border-[#0054a6] dark:focus:border-[#4a9eff] focus:ring-1 focus:ring-[#0054a6] dark:focus:ring-[#4a9eff] outline-none font-medium text-base text-[#1a1a1a] dark:text-[#f5f5f5] text-center transition-all">
+            </div>
+          </div>
+
+          <!-- Type Selector -->
+          <div>
+            <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Tipo</label>
+            <div class="grid grid-cols-3 gap-2 bg-[#f5f5f5] dark:bg-[#333333] p-1.5 rounded-lg">
+              <button type="button" (click)="arrangementForm.patchValue({type: 'incoming'})" [class]="arrangementForm.get('type')?.value === 'incoming' ? 'bg-white dark:bg-[#262626] text-[#0054a6] dark:text-[#4a9eff] shadow-sm' : 'text-[#666666] dark:text-[#999999]'" class="py-2.5 rounded-md font-semibold text-xs sm:text-sm transition-all">Visita</button>
+              <button type="button" (click)="arrangementForm.patchValue({type: 'outgoing'})" [class]="arrangementForm.get('type')?.value === 'outgoing' ? 'bg-white dark:bg-[#262626] text-[#d97706] dark:text-[#fbbf24] shadow-sm' : 'text-[#666666] dark:text-[#999999]'" class="py-2.5 rounded-md font-semibold text-xs sm:text-sm transition-all">Salida</button>
+              <button type="button" (click)="arrangementForm.patchValue({type: 'event'})" [class]="arrangementForm.get('type')?.value === 'event' ? 'bg-white dark:bg-[#262626] text-[#7c3aed] dark:text-[#a78bfa] shadow-sm' : 'text-[#666666] dark:text-[#999999]'" class="py-2.5 rounded-md font-semibold text-xs sm:text-sm transition-all">Evento</button>
+            </div>
+          </div>
+
+          <!-- Event Custom Label (Required if Event) -->
+          <div *ngIf="arrangementForm.get('type')?.value === 'event'">
+            <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Nombre del Evento</label>
+            <input type="text" formControlName="customLabel" class="w-full p-3 sm:p-4 bg-[#f5f5f5] dark:bg-[#333333] rounded-lg border border-[#e0e0e0] dark:border-[#404040] focus:border-[#0054a6] dark:focus:border-[#4a9eff] focus:ring-1 focus:ring-[#0054a6] dark:focus:ring-[#4a9eff] outline-none font-medium text-base text-[#1a1a1a] dark:text-[#f5f5f5] transition-all" placeholder="Ej: Asamblea Regional">
+          </div>
+
+          <!-- Speaker & Talk (Hidden for Events) -->
+          <ng-container *ngIf="arrangementForm.get('type')?.value !== 'event'">
+             <div>
+              <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Orador</label>
+              <select formControlName="speakerId" class="w-full p-3 sm:p-4 bg-[#f5f5f5] dark:bg-[#333333] rounded-lg border border-[#e0e0e0] dark:border-[#404040] focus:border-[#0054a6] dark:focus:border-[#4a9eff] focus:ring-1 focus:ring-[#0054a6] dark:focus:ring-[#4a9eff] outline-none font-medium text-base text-[#1a1a1a] dark:text-[#f5f5f5] appearance-none transition-all">
+                <option value="">Seleccionar orador...</option>
+                <option *ngFor="let s of speakers" [value]="s.id">{{ s.name }} ({{ s.congregation }})</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Nº Conferencia</label>
+              <select formControlName="conferenceNumber" class="w-full p-3 sm:p-4 bg-[#f5f5f5] dark:bg-[#333333] rounded-lg border border-[#e0e0e0] dark:border-[#404040] focus:border-[#0054a6] dark:focus:border-[#4a9eff] focus:ring-1 focus:ring-[#0054a6] dark:focus:ring-[#4a9eff] outline-none font-medium text-base text-[#1a1a1a] dark:text-[#f5f5f5] transition-all">
+                <option [ngValue]="null">---</option>
+                <option *ngFor="let t of titles" [value]="t.number">{{ t.number }} - {{ t.title }}</option>
+              </select>
+            </div>
+
+            <!-- Custom Label (Optional for talks) -->
+             <div>
+               <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Etiqueta (Opcional)</label>
+               <input type="text" formControlName="customLabel" class="w-full p-3 sm:p-4 bg-[#f5f5f5] dark:bg-[#333333] rounded-lg border border-[#e0e0e0] dark:border-[#404040] focus:border-[#0054a6] dark:focus:border-[#4a9eff] focus:ring-1 focus:ring-[#0054a6] dark:focus:ring-[#4a9eff] outline-none font-medium text-base text-[#1a1a1a] dark:text-[#f5f5f5] transition-all" placeholder="Ej: Presencial">
+             </div>
+          </ng-container>
+
+          <!-- Songs & Location -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Cántico</label>
+              <input type="number" formControlName="songNumber" class="w-full p-3 sm:p-4 bg-[#f5f5f5] dark:bg-[#333333] rounded-lg border border-[#e0e0e0] dark:border-[#404040] focus:border-[#0054a6] dark:focus:border-[#4a9eff] focus:ring-1 focus:ring-[#0054a6] dark:focus:ring-[#4a9eff] outline-none font-medium text-base text-[#1a1a1a] dark:text-[#f5f5f5] text-center transition-all" placeholder="#">
+            </div>
+            
+            <div *ngIf="arrangementForm.get('songNumber')?.value">
+               <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Título de Cántico</label>
+               <input type="text" formControlName="songTitle" class="w-full p-3 sm:p-4 bg-[#f5f5f5] dark:bg-[#333333] rounded-lg border border-[#e0e0e0] dark:border-[#404040] focus:border-[#0054a6] dark:focus:border-[#4a9eff] focus:ring-1 focus:ring-[#0054a6] dark:focus:ring-[#4a9eff] outline-none font-medium text-base text-[#1a1a1a] dark:text-[#f5f5f5] transition-all" placeholder="Título automático o manual">
+            </div>
+          </div>
+          
+          <!-- Location (Only for Outgoing or Event) -->
+          <div *ngIf="arrangementForm.get('type')?.value !== 'incoming'">
+            <label class="block text-xs font-semibold text-[#666666] dark:text-[#999999] uppercase tracking-wider mb-2">Ubicación</label>
+            <input type="text" formControlName="location" class="w-full p-3 sm:p-4 bg-[#f5f5f5] dark:bg-[#333333] rounded-lg border border-[#e0e0e0] dark:border-[#404040] focus:border-[#0054a6] dark:focus:border-[#4a9eff] focus:ring-1 focus:ring-[#0054a6] dark:focus:ring-[#4a9eff] outline-none font-medium text-base text-[#1a1a1a] dark:text-[#f5f5f5] transition-all" placeholder="Lugar...">
+          </div>
+
+          <div class="pt-3 sm:pt-4 flex gap-3 sm:gap-4">
+            <button type="button" (click)="showModal = false" class="flex-1 p-3 rounded-lg font-semibold text-base text-[#666666] dark:text-[#999999] hover:bg-[#f5f5f5] dark:hover:bg-[#333333] transition-all">Cancelar</button>
+            <button type="submit" [disabled]="arrangementForm.invalid" class="flex-1 p-3 bg-[#0054a6] dark:bg-[#4a9eff] text-white rounded-lg font-semibold text-base shadow-md disabled:opacity-50 hover:bg-[#003d7a] dark:hover:bg-[#6bb3ff] transition-all">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
