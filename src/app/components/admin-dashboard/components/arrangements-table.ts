@@ -28,11 +28,14 @@ import { Arrangement } from '../../../core/models/conference.models';
                 </div>
               </td>
               <td class="px-6 py-5">
-                <span [class]="{
-                  'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': arr.type === 'incoming',
-                  'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': arr.type === 'outgoing',
-                  'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': arr.type === 'event'
-                }" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border border-current/10">
+                <span 
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200': arr.type === 'incoming',
+                    'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200': arr.type === 'outgoing',
+                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200': arr.type === 'event'
+                  }"
+                  class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-transparent"
+                >
                   {{ arr.type === 'incoming' ? 'Visita' : arr.type === 'outgoing' ? 'Salida' : 'Evento' }}
                 </span>
               </td>
