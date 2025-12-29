@@ -9,9 +9,11 @@
     </div>
     <div class="flex items-center gap-2 sm:gap-4">
       <app-theme-toggle></app-theme-toggle>
-      <button *ngIf="isAuthorized()" (click)="logout()" class="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all shadow-sm border border-red-100 dark:border-red-900/30" title="Cerrar Sesión">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-      </button>
+      @if (isAuthorized()) {
+        <button (click)="logout()" class="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all shadow-sm border border-red-100 dark:border-red-900/30" title="Cerrar Sesión">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+        </button>
+      }
       <a routerLink="/" class="group flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-semibold text-[#0054a6] dark:text-[#4a9eff] hover:text-[#003d7a] dark:hover:text-[#6bb3ff] hover:bg-[#e6f2ff] dark:hover:bg-[#1a3d66] transition-all duration-200">
         <svg class="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
@@ -25,34 +27,38 @@
   <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-20">
     
     <!-- Login Screen -->
-    <div *ngIf="!isAuthorized()" class="flex flex-col items-center justify-center py-20 animate-in fade-in zoom-in duration-500">
-      <div class="bg-white dark:bg-[#1a1a1a] p-8 sm:p-12 rounded-[2.5rem] border-2 border-[#e5e7eb] dark:border-[#333333] shadow-2xl w-full max-w-md text-center">
-        <div class="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-3xl flex items-center justify-center text-[#0054a6] dark:text-[#4a9eff] mx-auto mb-6">
-          <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-        </div>
-        <h2 class="text-2xl font-black text-[#1a1a1a] dark:text-white mb-2 tracking-tight">Acceso Restringido</h2>
-        <p class="text-sm text-[#666666] dark:text-[#999999] mb-8 font-medium">Ingresa la clave de administrador para continuar.</p>
-        
-        <div class="space-y-4">
-          <input 
-            type="password" 
-            [(ngModel)]="adminPassword" 
-            (keyup.enter)="checkPassword()"
-            placeholder="Contraseña" 
-            class="w-full px-6 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-center font-bold text-[#1a1a1a] dark:text-white"
-          >
-          <div *ngIf="validationError()" class="text-red-500 text-xs font-bold animate-bounce">{{ validationError() }}</div>
-          <button 
-            (click)="checkPassword()" 
-            class="w-full py-4 bg-[#0054a6] dark:bg-[#4a9eff] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
-          >
-            Entrar
-          </button>
+    @if (!isAuthorized()) {
+      <div class="flex flex-col items-center justify-center py-20 animate-in fade-in zoom-in duration-500">
+        <div class="bg-white dark:bg-[#1a1a1a] p-8 sm:p-12 rounded-[2.5rem] border-2 border-[#e5e7eb] dark:border-[#333333] shadow-2xl w-full max-max-md text-center">
+          <div class="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-3xl flex items-center justify-center text-[#0054a6] dark:text-[#4a9eff] mx-auto mb-6">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          </div>
+          <h2 class="text-2xl font-black text-[#1a1a1a] dark:text-white mb-2 tracking-tight">Acceso Restringido</h2>
+          <p class="text-sm text-[#666666] dark:text-[#999999] mb-8 font-medium">Ingresa la clave de administrador para continuar.</p>
+          
+          <div class="space-y-4">
+            <input 
+              type="password" 
+              [(ngModel)]="adminPassword" 
+              (keyup.enter)="checkPassword()"
+              placeholder="Contraseña" 
+              class="w-full px-6 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-center font-bold text-[#1a1a1a] dark:text-white"
+            >
+            @if (validationError()) {
+              <div class="text-red-500 text-xs font-bold animate-bounce">{{ validationError() }}</div>
+            }
+            <button 
+              (click)="checkPassword()" 
+              class="w-full py-4 bg-[#0054a6] dark:bg-[#4a9eff] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
+            >
+              Entrar
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    }
 
-    <ng-container *ngIf="isAuthorized()">
+    @if (isAuthorized()) {
       <!-- Tabs -->
     <div class="flex gap-2 mb-8 bg-[#f5f5f5] dark:bg-[#262626] p-1.5 rounded-xl w-full sm:w-fit border border-[#e0e0e0] dark:border-[#333333] overflow-x-auto">
       <button (click)="setTab('arrangements')" [class]="activeTab() === 'arrangements' ? 'bg-white dark:bg-[#333333] text-[#0054a6] dark:text-[#4a9eff] shadow-sm' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-[#f5f5f5]'" class="px-4 py-2.5 rounded-lg font-semibold text-sm whitespace-nowrap transition-all cursor-pointer">Arreglos</button>
@@ -62,7 +68,7 @@
     </div>
 
     <!-- 1. Arrangements Tab -->
-    <div *ngIf="activeTab() === 'arrangements'">
+    @if (activeTab() === 'arrangements') {
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
           <h2 class="text-2xl sm:text-3xl font-black text-[#1a1a1a] dark:text-[#f5f5f5] tracking-tight">Lista de Conferencias</h2>
@@ -128,7 +134,8 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-[#e5e7eb] dark:divide-[#333333]">
-            <tr *ngFor="let arr of filteredArrangements()" class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+            @for (arr of filteredArrangements(); track arr.id) {
+              <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
               <td class="px-6 py-5">
                 <div class="flex flex-col">
                   <span class="text-[10px] font-bold text-[#0054a6] dark:text-[#4a9eff] uppercase tracking-wider mb-0.5">{{ arr.date | date:'EEE' }}</span>
@@ -136,7 +143,7 @@
                 </div>
               </td>
               <td class="px-6 py-5">
-                <span [ngClass]="{
+                <span [class]="{
                   'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': arr.type === 'incoming',
                   'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': arr.type === 'outgoing',
                   'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': arr.type === 'event'
@@ -175,14 +182,14 @@
                   </button>
                 </div>
               </td>
-            </tr>
+            }
           </tbody>
         </table>
       </div>
-    </div>
+    }
 
     <!-- 2. Speakers Tab -->
-    <div *ngIf="activeTab() === 'speakers'">
+    @if (activeTab() === 'speakers') {
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
           <h2 class="text-2xl sm:text-3xl font-black text-[#1a1a1a] dark:text-[#f5f5f5] tracking-tight">Gestión de Oradores</h2>
@@ -197,7 +204,8 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div *ngFor="let speaker of speakers()" class="bg-white dark:bg-[#1a1a1a] rounded-3xl p-6 border border-[#e5e7eb] dark:border-[#333333] shadow-lg hover:border-[#0054a6] dark:hover:border-[#4a9eff] transition-all group">
+        @for (speaker of speakers(); track speaker.id) {
+          <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl p-6 border border-[#e5e7eb] dark:border-[#333333] shadow-lg hover:border-[#0054a6] dark:hover:border-[#4a9eff] transition-all group">
           <div class="flex justify-between items-start mb-4">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-[#0054a6] dark:text-[#4a9eff]">
@@ -219,18 +227,21 @@
               <span>{{ speaker.phone || 'Sin teléfono' }}</span>
             </div>
             <div class="flex flex-wrap gap-1.5 pt-2">
-              <span *ngFor="let num of speaker.repertoire" class="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800">
-                #{{ num }}
-              </span>
-              <span *ngIf="!speaker.repertoire?.length" class="text-[10px] text-[#999999] italic">Sin temas asignados</span>
+              @for (num of speaker.repertoire; track num) {
+                <span class="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800">
+                  #{{ num }}
+                </span>
+              } @empty {
+                <span class="text-[10px] text-[#999999] italic">Sin temas asignados</span>
+              }
             </div>
-          </div>
+          }
         </div>
       </div>
     </div>
 
     <!-- 3. Neighbors Tab -->
-    <div *ngIf="activeTab() === 'neighbors'">
+    @if (activeTab() === 'neighbors') {
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
           <h2 class="text-2xl sm:text-3xl font-black text-[#1a1a1a] dark:text-[#f5f5f5] tracking-tight">Congregaciones Vecinas</h2>
@@ -245,7 +256,8 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div *ngFor="let n of neighbors()" class="bg-white dark:bg-[#1a1a1a] rounded-3xl p-6 border border-[#e5e7eb] dark:border-[#333333] shadow-lg hover:border-[#0054a6] dark:hover:border-[#4a9eff] transition-all group">
+        @for (n of neighbors(); track n.id) {
+          <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl p-6 border border-[#e5e7eb] dark:border-[#333333] shadow-lg hover:border-[#0054a6] dark:hover:border-[#4a9eff] transition-all group">
           <div class="flex justify-between items-start mb-4">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
@@ -267,13 +279,13 @@
               <span class="text-sm font-bold text-[#1a1a1a] dark:text-white">{{ n.coordinatorName }}</span>
               <span class="text-xs text-[#0054a6] dark:text-[#4a9eff] font-black">{{ n.coordinatorPhone }}</span>
             </div>
-          </div>
+          }
         </div>
       </div>
-    </div>
+    }
 
     <!-- 4. Titles Tab -->
-    <div *ngIf="activeTab() === 'titles'">
+    @if (activeTab() === 'titles') {
        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
           <h2 class="text-2xl sm:text-3xl font-black text-[#1a1a1a] dark:text-[#f5f5f5] tracking-tight">Temas de Conferencias</h2>
@@ -298,7 +310,8 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-[#e5e7eb] dark:divide-[#333333]">
-              <tr *ngFor="let t of titles()" class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+              @for (t of titles(); track t.number) {
+                <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                 <td class="px-6 py-4 font-black text-[#0054a6] dark:text-[#4a9eff]">#{{ t.number }}</td>
                 <td class="px-6 py-4 text-sm font-bold text-[#1a1a1a] dark:text-white">{{ t.title }}</td>
                 <td class="px-6 py-4 text-center">
@@ -306,17 +319,17 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                   </button>
                 </td>
-              </tr>
+              }
             </tbody>
           </table>
         </div>
       </div>
-    </div>
+    }
 
   <!-- --- MODAL --- -->
-  <div *ngIf="showModal()" 
-       (click)="showModal.set(false)"
-       class="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all overflow-y-auto">
+  @if (showModal()) {
+    <div (click)="showModal.set(false)"
+         class="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all overflow-y-auto">
     
     <div (click)="$event.stopPropagation()" 
          class="bg-white dark:bg-[#1a1a1a] rounded-3xl sm:rounded-[2.5rem] w-full max-w-2xl shadow-2xl relative border border-[#e5e7eb] dark:border-[#333333] my-4 sm:my-8 transition-transform animate-in fade-in zoom-in duration-300">
@@ -334,15 +347,18 @@
           </button>
         </div>
 
-        <div *ngIf="validationError()" class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50 rounded-2xl text-red-600 dark:text-red-400 text-sm font-bold flex items-center gap-3">
-          <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" /></svg>
-          {{ validationError() }}
-        </div>
+        @if (validationError()) {
+          <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50 rounded-2xl text-red-600 dark:text-red-400 text-sm font-bold flex items-center gap-3">
+            <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" /></svg>
+            {{ validationError() }}
+          </div>
+        }
 
         <!-- --- Forms --- -->
         
         <!-- Arrangement Form -->
-        <form *ngIf="activeTab() === 'arrangements'" [formGroup]="arrangementForm" (ngSubmit)="saveArrangement()" class="space-y-6">
+        @if (activeTab() === 'arrangements') {
+          <form [formGroup]="arrangementForm" (ngSubmit)="saveArrangement()" class="space-y-6">
           <div class="grid grid-cols-2 gap-4">
             <div class="space-y-2">
               <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Fecha</label>
@@ -363,14 +379,16 @@
             </div>
           </div>
 
-          <ng-container *ngIf="arrangementForm.get('type')?.value !== 'event'">
+          @if (arrangementForm.get('type')?.value !== 'event') {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <!-- Select Congregation (Filter) -->
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">1. Filtrar por Congregación</label>
                 <select [ngModel]="selectedCongreFilter()" (ngModelChange)="selectedCongreFilter.set($event)" [ngModelOptions]="{standalone: true}" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold appearance-none text-[#1a1a1a] dark:text-white">
                   <option value="" class="dark:bg-[#1a1a1a]">Todas las congregaciones</option>
-                  <option *ngFor="let n of neighbors()" [value]="n.name" class="dark:bg-[#1a1a1a]">{{ n.name }}</option>
+                  @for (n of neighbors(); track n.id) {
+                    <option [value]="n.name" class="dark:bg-[#1a1a1a]">{{ n.name }}</option>
+                  }
                 </select>
               </div>
 
@@ -379,7 +397,9 @@
                 <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">2. Buscar por Nº de Tema</label>
                 <div class="relative">
                   <input type="number" [ngModel]="desiredTalkNumber()" (ngModelChange)="desiredTalkNumber.set($event)" [ngModelOptions]="{standalone: true}" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white" placeholder="Ej: 45">
-                  <span *ngIf="desiredTalkNumber()" (click)="desiredTalkNumber.set(null)" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-red-500 cursor-pointer">Limpiar</span>
+                  @if (desiredTalkNumber()) {
+                    <span (click)="desiredTalkNumber.set(null)" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-red-500 cursor-pointer">Limpiar</span>
+                  }
                 </div>
               </div>
             </div>
@@ -388,7 +408,9 @@
               <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">3. Seleccionar Orador</label>
               <select formControlName="speakerId" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#0054a6]/30 dark:border-[#4a9eff]/30 rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold appearance-none shadow-sm shadow-blue-500/5 text-[#1a1a1a] dark:text-white">
                 <option value="" class="dark:bg-[#1a1a1a]">{{ availableSpeakers().length ? 'Seleccionar orador...' : 'No hay oradores con estos filtros' }}</option>
-                <option *ngFor="let s of availableSpeakers()" [value]="s.id" class="dark:bg-[#1a1a1a]">{{ s.name }} ({{ s.congregation }})</option>
+                @for (s of availableSpeakers(); track s.id) {
+                  <option [value]="s.id" class="dark:bg-[#1a1a1a]">{{ s.name }} ({{ s.congregation }})</option>
+                }
               </select>
             </div>
 
@@ -396,20 +418,28 @@
               <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">4. Seleccionar Tema del Orador</label>
               <select formControlName="conferenceNumber" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold appearance-none text-[#1a1a1a] dark:text-white">
                 <option [ngValue]="null" class="dark:bg-[#1a1a1a]">Seleccionar tema del repertorio...</option>
-                <optgroup label="Repertorio del Orador" *ngIf="getSelectedSpeakerRepertoire().length > 0" class="dark:bg-[#1a1a1a]">
-                  <option *ngFor="let t of getSelectedSpeakerTitles()" [value]="t.number" [class.bg-blue-50]="t.number === desiredTalkNumber()" class="dark:bg-[#1a1a1a]">#{{ t.number }} - {{ t.title }}</option>
-                </optgroup>
+                @if (getSelectedSpeakerRepertoire().length > 0) {
+                  <optgroup label="Repertorio del Orador" class="dark:bg-[#1a1a1a]">
+                    @for (t of getSelectedSpeakerTitles(); track t.number) {
+                      <option [value]="t.number" [class.bg-blue-50]="t.number === desiredTalkNumber()" class="dark:bg-[#1a1a1a]">#{{ t.number }} - {{ t.title }}</option>
+                    }
+                  </optgroup>
+                }
                 <optgroup label="Otros Temas (Fuera de repertorio)" class="dark:bg-[#1a1a1a]">
-                  <option *ngFor="let t of titles()" [value]="t.number" class="dark:bg-[#1a1a1a]">#{{ t.number }} - {{ t.title }}</option>
+                  @for (t of titles(); track t.number) {
+                    <option [value]="t.number" class="dark:bg-[#1a1a1a]">#{{ t.number }} - {{ t.title }}</option>
+                  }
                 </optgroup>
               </select>
             </div>
-          </ng-container>
+          }
 
-          <div *ngIf="arrangementForm.get('type')?.value === 'event'" class="space-y-2">
-            <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Nombre del Evento / Etiqueta</label>
-            <input type="text" formControlName="customLabel" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white" placeholder="Ej: Visita SC, Asamblea...">
-          </div>
+          @if (arrangementForm.get('type')?.value === 'event') {
+            <div class="space-y-2">
+              <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Nombre del Evento / Etiqueta</label>
+              <input type="text" formControlName="customLabel" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white" placeholder="Ej: Visita SC, Asamblea...">
+            </div>
+          }
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-2">
@@ -429,7 +459,8 @@
         </form>
 
         <!-- Speaker Form -->
-        <form *ngIf="activeTab() === 'speakers'" [formGroup]="speakerForm" (ngSubmit)="saveSpeaker()" class="space-y-6">
+        @if (activeTab() === 'speakers') {
+          <form [formGroup]="speakerForm" (ngSubmit)="saveSpeaker()" class="space-y-6">
           <div class="space-y-2">
             <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Nombre Completo</label>
             <input type="text" formControlName="name" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white">
@@ -440,12 +471,16 @@
               <div class="relative">
                 <select formControlName="congregation" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold appearance-none text-[#1a1a1a] dark:text-white">
                   <option value="" class="dark:bg-[#1a1a1a]">Seleccionar congregación...</option>
-                  <option *ngFor="let n of neighbors()" [value]="n.name" class="dark:bg-[#1a1a1a]">{{ n.name }}</option>
+                  @for (n of neighbors(); track n.id) {
+                    <option [value]="n.name" class="dark:bg-[#1a1a1a]">{{ n.name }}</option>
+                  }
                   <option value="CUSTOM" class="dark:bg-[#1a1a1a]">-- Otra (Escribir abajo) --</option>
                 </select>
               </div>
               <!-- Custom input if needed (simple management) -->
-              <input *ngIf="speakerForm.get('congregation')?.value === 'CUSTOM'" type="text" (blur)="speakerForm.patchValue({congregation: $any($event.target).value})" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#0054a6] rounded-2xl outline-none text-sm font-bold mt-2 text-[#1a1a1a] dark:text-white" placeholder="Escribe el nombre de la otra congregación...">
+              @if (speakerForm.get('congregation')?.value === 'CUSTOM') {
+                <input type="text" (blur)="speakerForm.patchValue({congregation: $any($event.target).value})" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#0054a6] rounded-2xl outline-none text-sm font-bold mt-2 text-[#1a1a1a] dark:text-white" placeholder="Escribe el nombre de la otra congregación...">
+              }
             </div>
             <div class="space-y-2">
               <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Teléfono</label>
@@ -461,12 +496,16 @@
           <div class="space-y-2">
             <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Repertorio de Temas</label>
             <div class="p-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl max-h-48 overflow-y-auto space-y-2">
-              <div *ngFor="let t of titles()" (click)="toggleRepertoire(t.number)" class="flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all" [class.bg-emerald-50]="isTitleInRepertoire(t.number)" [class.dark:bg-emerald-900/30]="isTitleInRepertoire(t.number)">
-                <span class="text-xs font-bold" [class.text-emerald-600]="isTitleInRepertoire(t.number)" [class.dark:text-emerald-400]="isTitleInRepertoire(t.number)" [class.dark:text-white]="!isTitleInRepertoire(t.number)">{{ t.number }} - {{ t.title }}</span>
-                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all" [class.border-emerald-500]="isTitleInRepertoire(t.number)" [class.bg-emerald-500]="isTitleInRepertoire(t.number)" [class.border-[#e5e7eb]]="!isTitleInRepertoire(t.number)">
-                  <svg *ngIf="isTitleInRepertoire(t.number)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
+              @for (t of titles(); track t.number) {
+                <div (click)="toggleRepertoire(t.number)" class="flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all" [class.bg-emerald-50]="isTitleInRepertoire(t.number)" [class.dark:bg-emerald-900/30]="isTitleInRepertoire(t.number)">
+                  <span class="text-xs font-bold" [class.text-emerald-600]="isTitleInRepertoire(t.number)" [class.dark:text-emerald-400]="isTitleInRepertoire(t.number)" [class.dark:text-white]="!isTitleInRepertoire(t.number)">{{ t.number }} - {{ t.title }}</span>
+                  <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all" [class.border-emerald-500]="isTitleInRepertoire(t.number)" [class.bg-emerald-500]="isTitleInRepertoire(t.number)" [class.border-[#e5e7eb]]="!isTitleInRepertoire(t.number)">
+                    @if (isTitleInRepertoire(t.number)) {
+                      <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
+                    }
+                  </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
 
@@ -477,7 +516,8 @@
         </form>
 
         <!-- Neighbor Form -->
-        <form *ngIf="activeTab() === 'neighbors'" [formGroup]="neighborForm" (ngSubmit)="saveNeighbor()" class="space-y-6">
+        @if (activeTab() === 'neighbors') {
+          <form [formGroup]="neighborForm" (ngSubmit)="saveNeighbor()" class="space-y-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-2">
               <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Congregación</label>
@@ -508,7 +548,8 @@
         </form>
 
         <!-- Title Form -->
-        <form *ngIf="activeTab() === 'titles'" [formGroup]="titleForm" (ngSubmit)="saveTitle()" class="space-y-6">
+        @if (activeTab() === 'titles') {
+          <form [formGroup]="titleForm" (ngSubmit)="saveTitle()" class="space-y-6">
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div class="sm:col-span-1 space-y-2">
               <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Número</label>
@@ -525,9 +566,8 @@
           </div>
         </form>
 
-        </div>
-      </div>
     </div>
-    </ng-container>
-  </main>
+    }
+  }
+</main>
 </div>
