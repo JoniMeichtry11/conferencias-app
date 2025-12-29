@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ConferenceService } from '../../core/services/conference.service';
 import { Arrangement } from '../../core/models/conference.models';
 import { ConferenceCardComponent } from '../conference-card/conference-card';
@@ -13,63 +14,61 @@ import { ThemeToggleComponent } from '../theme-toggle/theme-toggle';
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
-export class HomeComponent implements OnInit {
-  arrangements: Arrangement[] = [];
-  thisWeekArrangements: Arrangement[] = [];
-  futureArrangements: Arrangement[] = [];
-  viewMode: 'incoming' | 'outgoing' = 'incoming';
-  loading: boolean = true;
+export class HomeComponent {
+  private conferenceService = inject(ConferenceService);
 
-  constructor(private conferenceService: ConferenceService) {}
+  // State
+  viewMode = signal<'incoming' | 'outgoing'>('incoming');
+  
+  // Data from Firebase converted to Signal
+  private allArrangements = toSignal(this.conferenceService.getArrangements(), { initialValue: [] as Arrangement[] });
+  
+  // Computed loading state
+  loading = computed(() => this.allArrangements().length === 0);
 
-  ngOnInit() {
-    this.loadData();
-  }
-
-  setViewMode(mode: 'incoming' | 'outgoing') {
-    this.viewMode = mode;
-    this.filterData();
-  }
-
-  loadData() {
-    this.conferenceService.getArrangements().subscribe(all => {
-      this.arrangements = all;
-      this.filterData();
-      this.loading = false;
-    });
-  }
-
-  filterData() {
+  // Computed filtered data
+  private filteredByMode = computed(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // Calculate the end of this week (next Saturday at 23:59:59)
+    return this.allArrangements()
+      .filter(a => a.type === this.viewMode())
+      .filter(a => {
+        const arrDate = new Date(a.date);
+        arrDate.setHours(0, 0, 0, 0);
+        return arrDate >= today;
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  });
+
+  // Computed: End of week boundary
+  private endOfWeek = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const currentDay = today.getDay();
     let daysUntilSaturday = currentDay === 6 ? 0 : (currentDay === 0 ? 6 : 6 - currentDay);
     
-    const endOfWeek = new Date(today);
-    endOfWeek.setDate(today.getDate() + daysUntilSaturday);
-    endOfWeek.setHours(23, 59, 59, 999);
-    
-    // Filter by type and future date
-    const filtered = this.arrangements.filter(a => a.type === this.viewMode);
-    
-    const future = filtered.filter(a => {
-      const arrDate = new Date(a.date);
-      arrDate.setHours(0, 0, 0, 0);
-      return arrDate >= today;
-    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    
-    // This week's arrangements
-    this.thisWeekArrangements = future.filter(a => {
-      const arrDate = new Date(a.date);
-      return arrDate <= endOfWeek;
-    });
-    
-    // Future arrangements
-    this.futureArrangements = future.filter(a => {
-      const arrDate = new Date(a.date);
-      return arrDate > endOfWeek;
-    });
+    const date = new Date(today);
+    date.setDate(today.getDate() + daysUntilSaturday);
+    date.setHours(23, 59, 59, 999);
+    return date;
+  });
+
+  // Final display signals
+  thisWeekArrangements = computed(() => {
+    const limit = this.endOfWeek();
+    return this.filteredByMode().filter(a => new Date(a.date) <= limit);
+  });
+
+  futureArrangements = computed(() => {
+    const limit = this.endOfWeek();
+    return this.filteredByMode().filter(a => new Date(a.date) > limit);
+  });
+
+  setViewMode(mode: 'incoming' | 'outgoing') {
+    this.viewMode.set(mode);
   }
+
+  // Helper for empty state check in template
+  hasArrangements = computed(() => this.allArrangements().length > 0);
 }

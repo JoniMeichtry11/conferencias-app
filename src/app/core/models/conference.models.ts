@@ -1,19 +1,21 @@
 export interface Speaker {
-  id: string;
+  id?: string;
   name: string;
   congregation: string;
   phone?: string;
   isLocal: boolean;
   notes?: string;
+  repertoire?: number[]; // Array of conference talk numbers
 }
 
 export interface ConferenceTitle {
   number: number;
   title: string;
+  id?: string; // Add optional id to satisfy collectionData requirements
 }
 
 export interface Arrangement {
-  id: string;
+  id?: string;
   date: string; // ISO date string YYYY-MM-DD
   time: string; // HH:mm
   type: 'incoming' | 'outgoing' | 'event';
@@ -31,7 +33,7 @@ export interface Arrangement {
 }
 
 export interface NeighborCongregation {
-  id: string;
+  id?: string;
   name: string;
   town: string;
   coordinatorName: string;

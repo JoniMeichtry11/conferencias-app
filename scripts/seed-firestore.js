@@ -39,10 +39,10 @@ const MOCK_TITLES = [
 ];
 
 const MOCK_SPEAKERS = [
-  { id: 'sp1', name: 'Juan Pérez', congregation: 'Wheelwright', isLocal: true, phone: '2473456789' },
-  { id: 'sp2', name: 'Diego Rossi', congregation: 'Wheelwright', isLocal: true, phone: '2473112233' },
-  { id: 'sp3', name: 'Carlos López', congregation: 'Hughes', isLocal: false, phone: '2473000111' },
-  { id: 'sp4', name: 'Martín García', congregation: 'Colón', isLocal: false, phone: '2475000222' }
+  { id: 'sp1', name: 'Juan Pérez', congregation: 'Wheelwright', isLocal: true, phone: '2473456789', repertoire: [1, 2, 5] },
+  { id: 'sp2', name: 'Diego Rossi', congregation: 'Wheelwright', isLocal: true, phone: '2473112233', repertoire: [3, 7, 10] },
+  { id: 'sp3', name: 'Carlos López', congregation: 'Hughes', isLocal: false, phone: '2473000111', repertoire: [5, 100] },
+  { id: 'sp4', name: 'Martín García', congregation: 'Colón', isLocal: false, phone: '2475000222', repertoire: [1, 7] }
 ];
 
 const MOCK_NEIGHBORS = [

@@ -22,14 +22,14 @@
       <div class="flex bg-white dark:bg-[#1a1a1a] p-1 rounded-3xl border border-[#e5e7eb] dark:border-[#1f1f1f] shadow-lg shadow-black/5 dark:shadow-white/5">
         <button 
           (click)="setViewMode('incoming')"
-          [class]="viewMode === 'incoming' ? 'bg-[#1a1a1a] dark:bg-white text-white dark:text-[#1a1a1a] shadow-md' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-white'"
+          [class]="viewMode() === 'incoming' ? 'bg-[#1a1a1a] dark:bg-white text-white dark:text-[#1a1a1a] shadow-md' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-white'"
           class="px-6 sm:px-8 py-2.5 sm:py-3 rounded-[1.25rem] font-bold text-xs sm:text-sm transition-all duration-300 uppercase tracking-wider"
         >
           Conferencias
         </button>
         <button 
           (click)="setViewMode('outgoing')"
-          [class]="viewMode === 'outgoing' ? 'bg-[#1a1a1a] dark:bg-white text-white dark:text-[#1a1a1a] shadow-md' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-white'"
+          [class]="viewMode() === 'outgoing' ? 'bg-[#1a1a1a] dark:bg-white text-white dark:text-[#1a1a1a] shadow-md' : 'text-[#666666] dark:text-[#999999] hover:text-[#1a1a1a] dark:hover:text-white'"
           class="px-6 sm:px-8 py-2.5 sm:py-3 rounded-[1.25rem] font-bold text-xs sm:text-sm transition-all duration-300 uppercase tracking-wider"
         >
           Salen a dar conferencia
@@ -37,12 +37,12 @@
       </div>
     </div>
 
-    @if (loading) {
+    @if (loading()) {
       <div class="flex flex-col items-center justify-center py-40 space-y-8">
         <div class="w-16 h-16 border-4 border-[#1a1a1a] dark:border-white/20 border-t-transparent dark:border-t-white rounded-full animate-spin"></div>
         <p class="text-sm font-bold text-[#999999] dark:text-[#666666] uppercase tracking-[0.3em] animate-pulse">Cargando datos</p>
       </div>
-    } @else if (arrangements.length === 0) {
+    } @else if (!hasArrangements()) {
       <div class="text-center py-40 bg-white dark:bg-[#1a1a1a] rounded-4xl border border-dashed border-[#e5e7eb] dark:border-[#1f1f1f]">
         <div class="text-6xl mb-8">🗓️</div>
         <h3 class="text-2xl font-bold text-[#1a1a1a] dark:text-white mb-2">No hay arreglos programados</h3>
@@ -51,7 +51,7 @@
     } @else {
       <!-- Current Week -->
       <div class="space-y-12 sm:space-y-16">
-        @if (thisWeekArrangements.length > 0) {
+        @if (thisWeekArrangements().length > 0) {
           <section class="space-y-6">
             <div class="flex items-center gap-4">
               <h2 class="text-xs font-black text-[#1a1a1a] dark:text-white uppercase tracking-[0.4em] italic">Esta Semana</h2>
@@ -59,7 +59,7 @@
             </div>
             
             <div class="grid gap-6">
-              @for (arr of thisWeekArrangements; track arr.id) {
+              @for (arr of thisWeekArrangements(); track arr.id) {
                 <app-conference-card [arrangement]="arr" [isNext]="true"></app-conference-card>
               }
             </div>
@@ -67,7 +67,7 @@
         }
 
         <!-- Roadmap / Future -->
-        @if (futureArrangements.length > 0) {
+        @if (futureArrangements().length > 0) {
           <section class="space-y-6">
             <div class="flex items-center gap-4">
               <h2 class="text-xs font-black text-[#1a1a1a] dark:text-white uppercase tracking-[0.4em] italic">Próximas Conferencias</h2>
@@ -75,7 +75,7 @@
             </div>
 
             <div class="relative pl-10 sm:pl-12 space-y-8 sm:space-y-10 before:absolute before:left-5 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#e5e7eb] dark:before:bg-[#1f1f1f] before:rounded-full">
-              @for (arr of futureArrangements; track arr.id; let i = $index) {
+              @for (arr of futureArrangements(); track arr.id; let i = $index) {
                 <div class="relative group">
                   <!-- Roadmap Node -->
                   <div class="absolute -left-[24px] sm:-left-[30px] top-8 sm:top-10 w-3 h-3 rounded-full bg-white dark:bg-[#0f0f0f] border-[3px] border-[#1a1a1a] dark:border-white z-10 transition-transform group-hover:scale-150"></div>
