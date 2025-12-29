@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormsModule } from '@angular/forms';
 import { NeighborCongregation, ConferenceTitle } from '../../../core/models/conference.models';
@@ -8,7 +8,7 @@ import { NeighborCongregation, ConferenceTitle } from '../../../core/models/conf
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   template: `
-    <form [formGroup]="form()" (ngSubmit)="submit.emit()" class="space-y-6">
+    <form [formGroup]="form()" (ngSubmit)="handleFormSubmit($event)" class="space-y-6">
       <div class="space-y-2">
         <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Nombre Completo</label>
         <input type="text" formControlName="name" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white">
@@ -57,23 +57,37 @@ import { NeighborCongregation, ConferenceTitle } from '../../../core/models/conf
 
       <div class="flex gap-4 pt-4">
         <button type="button" (click)="cancel.emit()" class="flex-1 px-5 py-4 rounded-2xl font-black uppercase text-xs text-[#666666] dark:text-[#999999] hover:bg-[#f8f9fa] dark:hover:bg-[#262626] transition-all">Cancelar</button>
-        <button type="submit" [disabled]="form().invalid" class="flex-1 px-5 py-4 bg-[#0054a6] dark:bg-[#4a9eff] text-white rounded-2xl font-black uppercase text-xs shadow-xl active:scale-95 transition-all">Guardar Orador</button>
+        <button type="submit" [disabled]="form().invalid || isSaving() || localLoading()" class="flex-1 px-5 py-4 bg-[#0054a6] dark:bg-[#4a9eff] text-white rounded-2xl font-black uppercase text-xs shadow-xl active:scale-95 transition-all">
+          {{ (isSaving() || localLoading()) ? 'Guardando...' : 'Guardar Orador' }}
+        </button>
       </div>
     </form>
   `
 })
 export class SpeakerFormComponent {
   form = input.required<FormGroup>();
+  isSaving = input<boolean>(false);
+  localLoading = signal(false);
   neighbors = input<NeighborCongregation[]>([]);
   titles = input<ConferenceTitle[]>([]);
   repertoire = input<number[]>([]);
   
-  submit = output<void>();
+  formSubmit = output<void>();
   cancel = output<void>();
   toggleRepertoire = output<number>();
 
   isTitleInRepertoire(num: number): boolean {
     return this.repertoire().includes(num);
+  }
+
+  handleFormSubmit(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.localLoading()) return;
+    this.localLoading.set(true);
+    this.formSubmit.emit();
+    // Re-enable after a short delay in case of parent failure
+    setTimeout(() => this.localLoading.set(false), 2000);
   }
 
   onCustomCongregationBlur(event: any) {

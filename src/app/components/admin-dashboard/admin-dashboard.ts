@@ -47,6 +47,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private conferenceService = inject(ConferenceService);
   private fb = inject(FormBuilder);
   public themeService = inject(ThemeService);
+ 
+  private isProcessing = false;
 
   // Signals for Data from Firebase
   speakers = toSignal(this.conferenceService.getSpeakers(), { initialValue: [] as Speaker[] });
@@ -81,6 +83,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   adminPassword = '';
   
   validationError = signal('');
+  isSaving = signal(false);
 
   // Subscriptions for form logic
   private subs = new Subscription();
@@ -268,10 +271,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   async saveArrangement() {
-    if (this.arrangementForm.invalid) {
-      this.validationError.set('Por favor completa todos los campos requeridos');
+    if (this.isProcessing || this.arrangementForm.invalid || this.isSaving()) {
+      if (this.arrangementForm.invalid) this.validationError.set('Por favor completa todos los campos requeridos');
       return;
     }
+ 
+    this.isProcessing = true;
+    this.isSaving.set(true);
 
     const formVal = this.arrangementForm.getRawValue();
     const speaker = this.speakers().find(s => s.id === formVal.speakerId);
@@ -306,6 +312,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       this.showModal.set(false);
     } catch (err) {
       this.validationError.set('Error al guardar en la base de datos');
+    } finally {
+      this.isSaving.set(false);
+      this.isProcessing = false;
     }
   }
 
@@ -333,7 +342,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   async saveSpeaker() {
-    if (this.speakerForm.invalid) return;
+    if (this.isProcessing || this.speakerForm.invalid || this.isSaving()) return;
+    this.isProcessing = true;
+    this.isSaving.set(true);
     const data = this.speakerForm.value;
     try {
       const editing = this.editingSpeaker();
@@ -345,6 +356,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       this.showModal.set(false);
     } catch (err) {
       this.validationError.set('Error al guardar orador');
+    } finally {
+      this.isSaving.set(false);
+      this.isProcessing = false;
     }
   }
 
@@ -372,7 +386,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   async saveNeighbor() {
-    if (this.neighborForm.invalid) return;
+    if (this.isProcessing || this.neighborForm.invalid || this.isSaving()) return;
+    this.isProcessing = true;
+    this.isSaving.set(true);
     const data = this.neighborForm.value;
     try {
       const editing = this.editingNeighbor();
@@ -384,6 +400,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       this.showModal.set(false);
     } catch (err) {
       this.validationError.set('Error al guardar congregación');
+    } finally {
+      this.isSaving.set(false);
+      this.isProcessing = false;
     }
   }
 
@@ -411,13 +430,18 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   async saveTitle() {
-    if (this.titleForm.invalid) return;
+    if (this.isProcessing || this.titleForm.invalid || this.isSaving()) return;
+    this.isProcessing = true;
+    this.isSaving.set(true);
     const data = this.titleForm.value;
     try {
       await firstValueFrom(this.conferenceService.saveTitle(data));
       this.showModal.set(false);
     } catch (err) {
       this.validationError.set('Error al guardar tema');
+    } finally {
+      this.isSaving.set(false);
+      this.isProcessing = false;
     }
   }
 

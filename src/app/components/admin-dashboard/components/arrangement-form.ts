@@ -1,4 +1,4 @@
-import { Component, input, output, computed } from '@angular/core';
+import { Component, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormsModule } from '@angular/forms';
 import { Speaker, NeighborCongregation, ConferenceTitle } from '../../../core/models/conference.models';
@@ -8,7 +8,7 @@ import { Speaker, NeighborCongregation, ConferenceTitle } from '../../../core/mo
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   template: `
-    <form [formGroup]="form()" (ngSubmit)="submit.emit()" class="space-y-6">
+    <form [formGroup]="form()" (ngSubmit)="handleFormSubmit($event)" class="space-y-6">
       <div class="grid grid-cols-2 gap-4">
         <div class="space-y-2">
           <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">Fecha</label>
@@ -102,13 +102,17 @@ import { Speaker, NeighborCongregation, ConferenceTitle } from '../../../core/mo
 
       <div class="flex gap-4 pt-6">
         <button type="button" (click)="cancel.emit()" class="flex-1 px-5 py-4 rounded-2xl font-black uppercase text-xs text-[#666666] hover:bg-[#f8f9fa] dark:hover:bg-[#262626] transition-all border-2 border-transparent">Cancelar</button>
-        <button type="submit" [disabled]="form().invalid" class="flex-1 px-5 py-4 bg-[#0054a6] dark:bg-[#4a9eff] text-white rounded-2xl font-black uppercase text-xs shadow-xl shadow-blue-500/20 disabled:opacity-50 transition-all active:scale-95">Guardar</button>
+        <button type="submit" [disabled]="form().invalid || isSaving() || localLoading()" class="flex-1 px-5 py-4 bg-[#0054a6] dark:bg-[#4a9eff] text-white rounded-2xl font-black uppercase text-xs shadow-xl shadow-blue-500/20 disabled:opacity-50 transition-all active:scale-95">
+          {{ (isSaving() || localLoading()) ? 'Guardando...' : 'Guardar' }}
+        </button>
       </div>
     </form>
   `
 })
 export class ArrangementFormComponent {
   form = input.required<FormGroup>();
+  isSaving = input<boolean>(false);
+  localLoading = signal(false);
   availableSpeakers = input<Speaker[]>([]);
   neighbors = input<NeighborCongregation[]>([]);
   titles = input<ConferenceTitle[]>([]);
@@ -122,6 +126,15 @@ export class ArrangementFormComponent {
   selectedCongreFilterChange = output<string>();
   desiredTalkNumberChange = output<number | null>();
   
-  submit = output<void>();
+  formSubmit = output<void>();
   cancel = output<void>();
+
+  handleFormSubmit(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.localLoading() || this.isSaving()) return;
+    this.localLoading.set(true);
+    this.formSubmit.emit();
+    setTimeout(() => this.localLoading.set(false), 2000);
+  }
 }

@@ -178,6 +178,7 @@
               @if (activeTab() === 'arrangements') {
                 <app-arrangement-form
                   [form]="arrangementForm"
+                  [isSaving]="isSaving()"
                   [availableSpeakers]="availableSpeakers()"
                   [neighbors]="neighbors()"
                   [titles]="titles()"
@@ -187,7 +188,7 @@
                   (desiredTalkNumberChange)="desiredTalkNumber.set($event)"
                   [selectedSpeakerRepertoire]="getSelectedSpeakerRepertoire()"
                   [selectedSpeakerTitles]="getSelectedSpeakerTitles()"
-                  (submit)="saveArrangement()"
+                  (formSubmit)="saveArrangement()"
                   (cancel)="showModal.set(false)">
                 </app-arrangement-form>
               }
@@ -195,11 +196,12 @@
               @if (activeTab() === 'speakers') {
                 <app-speaker-form
                   [form]="speakerForm"
+                  [isSaving]="isSaving()"
                   [neighbors]="neighbors()"
                   [titles]="titles()"
                   [repertoire]="speakerForm.get('repertoire')?.value || []"
                   (toggleRepertoire)="toggleRepertoire($event)"
-                  (submit)="saveSpeaker()"
+                  (formSubmit)="saveSpeaker()"
                   (cancel)="showModal.set(false)">
                 </app-speaker-form>
               }
@@ -207,7 +209,8 @@
               @if (activeTab() === 'neighbors') {
                 <app-neighbor-form
                   [form]="neighborForm"
-                  (submit)="saveNeighbor()"
+                  [isSaving]="isSaving()"
+                  (formSubmit)="saveNeighbor()"
                   (cancel)="showModal.set(false)">
                 </app-neighbor-form>
               }
@@ -215,8 +218,9 @@
               @if (activeTab() === 'titles') {
                 <app-title-form
                   [form]="titleForm"
+                  [isSaving]="isSaving()"
                   [readonlyNumber]="!!editingTitle()"
-                  (submit)="saveTitle()"
+                  (formSubmit)="saveTitle()"
                   (cancel)="showModal.set(false)">
                 </app-title-form>
               }
