@@ -76,7 +76,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   
   // New Workflow Signals
   selectedCongreFilter = signal<string>('');
-  desiredTalkNumber = signal<number | null>(null);
+  arrangementType = signal<'incoming' | 'outgoing' | 'event'>('incoming');
   
   // Authentication Signal
   isAuthorized = signal(false);
@@ -157,6 +157,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     // Watch for type changes to validate required fields
     this.subs.add(this.arrangementForm.get('type')?.valueChanges.subscribe(type => {
       this.updateValidators(type);
+      this.arrangementType.set(type);
     }));
   }
 
@@ -207,18 +208,30 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   });
 
-  // Filtered speakers based on congregation selection and talk search
+  // Filtered speakers based on congregation selection
   availableSpeakers = computed(() => {
     const congreName = this.selectedCongreFilter();
-    const talkNum = this.desiredTalkNumber();
+    const type = this.arrangementType();
     
-    return this.speakers().filter(s => {
-      const matchesCongre = !congreName || s.congregation === congreName;
-      const matchesTalk = !talkNum || s.repertoire?.includes(talkNum);
-      return matchesCongre && matchesTalk;
-    });
+    if (type === 'outgoing') {
+      // Para salidas, solo mostramos oradores locales
+      return this.speakers().filter(s => s.isLocal);
+    } else {
+      // Para visitas, filtramos por congregación si se seleccionó una
+      return this.speakers().filter(s => {
+        const matchesCongre = !congreName || s.congregation === congreName;
+        return matchesCongre;
+      });
+    }
   });
-
+ 
+  onCongreFilterChange(congre: string) {
+    this.selectedCongreFilter.set(congre);
+    if (this.arrangementType() === 'outgoing' && congre) {
+      this.arrangementForm.patchValue({ location: congre });
+    }
+  }
+ 
   // --- Navigation ---
 
   setTab(tab: any) {
@@ -238,7 +251,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   openAddModal() {
     this.editingArrangement.set(null);
     this.selectedCongreFilter.set('');
-    this.desiredTalkNumber.set(null);
+    this.arrangementType.set('incoming');
     this.arrangementForm.reset({ 
       date: '', 
       time: '19:30', 
@@ -253,7 +266,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   editArrangement(arr: Arrangement) {
     this.editingArrangement.set(arr);
     this.selectedCongreFilter.set(arr.speakerId ? this.speakers().find(s => s.id === arr.speakerId)?.congregation || '' : '');
-    this.desiredTalkNumber.set(null);
+    this.arrangementType.set(arr.type);
     this.arrangementForm.patchValue({
       date: arr.date,
       time: arr.time,
