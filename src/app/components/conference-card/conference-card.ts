@@ -23,12 +23,6 @@ export class ConferenceCardComponent {
     this.reminderSet.emit();
   }
 
-  shareWhatsApp() {
-    const message = this.conferenceService.generateWhatsAppMessage(this.arrangement);
-    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-  }
-
   formatDate(dateStr: string): string {
     return new Date(dateStr).toLocaleDateString('es-AR', {
       weekday: 'long',

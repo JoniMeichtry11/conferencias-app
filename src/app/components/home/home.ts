@@ -32,7 +32,12 @@ export class HomeComponent {
     today.setHours(0, 0, 0, 0);
     
     return this.allArrangements()
-      .filter(a => a.type === this.viewMode())
+      .filter(a => {
+        if (this.viewMode() === 'incoming') {
+          return a.type === 'incoming' || a.type === 'event';
+        }
+        return a.type === 'outgoing';
+      })
       .filter(a => {
         const arrDate = new Date(a.date);
         arrDate.setHours(0, 0, 0, 0);
