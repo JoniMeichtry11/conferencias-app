@@ -1,17 +1,17 @@
 <div class="min-h-screen bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
-<app-admin-navbar 
-  [isAuthorized]="isAuthorized()" 
+<app-admin-navbar
+  [isAuthorized]="isAuthorized()"
   (logout)="logout()">
 </app-admin-navbar>
 
   <!-- Content -->
   <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-20">
-    
+
     <!-- Login Screen -->
     @if (!isAuthorized()) {
-      <app-admin-login 
-        [(password)]="adminPassword" 
-        [error]="validationError()" 
+      <app-admin-login
+        [(password)]="adminPassword"
+        [error]="validationError()"
         (login)="checkPassword()">
       </app-admin-login>
     }
@@ -40,17 +40,17 @@
             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#999999] group-focus-within:text-[#0054a6] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input 
-              type="text" 
+            <input
+              type="text"
               [ngModel]="searchTerm()"
               (ngModelChange)="searchTerm.set($event)"
-              placeholder="Buscar por orador, título o congregación..." 
+              placeholder="Buscar por orador, título o congregación..."
               class="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white"
             >
           </div>
-          
+
           <div class="flex gap-4">
-            <select 
+            <select
               [ngModel]="filterType()"
               (ngModelChange)="setFilterType($event)"
               class="px-5 py-3.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white appearance-none cursor-pointer min-w-[140px]"
@@ -61,7 +61,17 @@
               <option value="event">Eventos</option>
             </select>
 
-            <button 
+            <select
+              [ngModel]="timeFilter()"
+              (ngModelChange)="setTimeFilter($event)"
+              class="px-5 py-3.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold text-[#1a1a1a] dark:text-white appearance-none cursor-pointer min-w-[140px]"
+            >
+              <option value="all">Todos los tiempos</option>
+              <option value="upcoming">Próximos</option>
+              <option value="past">Pasados</option>
+            </select>
+
+            <button
               (click)="toggleSort()"
               class="p-3.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#e5e7eb] dark:border-[#333333] rounded-2xl hover:border-[#0054a6] transition-all flex items-center gap-2 group"
             >
@@ -73,10 +83,95 @@
           </div>
         </div>
 
-        <app-arrangements-table 
-          [arrangements]="filteredArrangements()" 
-          (edit)="editArrangement($event)" 
-          (delete)="deleteArrangement($event!)">
+        <!-- Próximos Fines de Semana -->
+        <div class="mb-8">
+          <h3 class="text-lg font-black text-[#1a1a1a] dark:text-[#f5f5f5] tracking-tight mb-4">Próximos Fines de Semana</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (weekend of upcomingWeekends(); track weekend.saturday) {
+              <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border-2 {{ weekend.hasArrangement ? 'border-green-200 dark:border-green-800' : 'border-red-200 dark:border-red-800' }} p-5 shadow-lg">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 {{ weekend.hasArrangement ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-sm font-black text-[#1a1a1a] dark:text-white">{{ weekend.saturday | date:'d MMM' }} - {{ weekend.sunday | date:'d MMM' }}</span>
+                  </div>
+                  <span class="px-2 py-1 rounded-full text-xs font-bold {{ weekend.hasArrangement ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200' }}">
+                    {{ weekend.hasArrangement ? 'Con Arreglo' : 'Sin Arreglo' }}
+                  </span>
+                </div>
+
+                @if (weekend.hasArrangement) {
+                  <div class="space-y-2">
+                    @for (arr of weekend.arrangements; track arr.id) {
+                      <div (click)="editArrangement(arr)" class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-[#262626] rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors">
+                        <span class="px-2 py-1 rounded-full text-xs font-bold {{ arr.type === 'incoming' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200' : arr.type === 'outgoing' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' }}">
+                          {{ arr.type === 'incoming' ? 'Visita' : arr.type === 'outgoing' ? 'Salida' : 'Evento' }}
+                        </span>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-bold text-[#1a1a1a] dark:text-white truncate">{{ arr.conferenceTitle }}</p>
+                          <p class="text-xs text-[#555555] dark:text-[#aaaaaa]">{{ arr.speakerName }}</p>
+                          <p class="text-xs text-[#777777] dark:text-[#999999]">
+                            @if (arr.type === 'incoming') {
+                              Viene a Wheelwright
+                            } @else if (arr.type === 'outgoing') {
+                              Sale a {{ arr.location || 'Otra congregación' }}
+                            } @else {
+                              {{ arr.location || 'Evento especial' }}
+                            }
+                          </p>
+                        </div>
+                        @if (arr.type === 'incoming' || arr.type === 'outgoing') {
+                          <button
+                            (click)="shareWhatsApp(arr); $event.stopPropagation()"
+                            class="p-2 cursor-pointer rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 text-green-600 hover:text-green-700 transition-all shrink-0"
+                            title="Enviar mensaje de WhatsApp"
+                          >
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                            </svg>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="text-center py-4">
+                    <p class="text-sm text-[#555555] dark:text-[#aaaaaa] mb-3">No hay arreglos programados para este fin de semana</p>
+                    <button
+                      (click)="createArrangementForWeekend(weekend.saturday)"
+                      class="flex items-center gap-2 bg-[#0054a6] dark:bg-[#4a9eff] text-white px-4 py-2 rounded-xl font-bold hover:bg-[#003d7a] dark:hover:bg-[#6bb3ff] transition-all text-sm mx-auto"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      Crear Arreglo
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Ver Más Button -->
+        <div class="flex justify-center mb-8">
+          <button
+            (click)="loadMoreWeekends()"
+            class="flex items-center gap-2.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#0054a6] dark:border-[#4a9eff] text-[#0054a6] dark:text-[#4a9eff] px-6 py-3 rounded-2xl font-black hover:bg-[#0054a6] dark:hover:bg-[#4a9eff] hover:text-white dark:hover:text-white transition-all text-sm"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+            <span>Ver Más Fines de Semana</span>
+          </button>
+        </div>
+
+        <app-arrangements-table
+          [arrangements]="filteredArrangements()"
+          (edit)="editArrangement($event)"
+          (delete)="deleteArrangement($event!)"
+          (whatsapp)="shareWhatsApp($event)">
         </app-arrangements-table>
       }
 
@@ -95,9 +190,9 @@
           </button>
         </div>
 
-        <app-speakers-grid 
-          [speakers]="speakers()" 
-          (edit)="editSpeaker($event)" 
+        <app-speakers-grid
+          [speakers]="speakers()"
+          (edit)="editSpeaker($event)"
           (delete)="deleteSpeaker($event!)">
         </app-speakers-grid>
       }
@@ -117,9 +212,9 @@
           </button>
         </div>
 
-        <app-neighbors-grid 
-          [neighbors]="neighbors()" 
-          (edit)="editNeighbor($event)" 
+        <app-neighbors-grid
+          [neighbors]="neighbors()"
+          (edit)="editNeighbor($event)"
           (delete)="deleteNeighbor($event!)">
         </app-neighbors-grid>
       }
@@ -139,8 +234,8 @@
           </button>
         </div>
 
-        <app-titles-table 
-          [titles]="titles()" 
+        <app-titles-table
+          [titles]="titles()"
           (edit)="editTitle($event)">
         </app-titles-table>
       }
@@ -149,10 +244,10 @@
       @if (showModal()) {
         <div (click)="showModal.set(false)"
              class="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all overflow-y-auto">
-        
-          <div (click)="$event.stopPropagation()" 
+
+          <div (click)="$event.stopPropagation()"
                class="bg-white dark:bg-[#1a1a1a] rounded-3xl sm:rounded-[2.5rem] w-full max-w-2xl shadow-2xl relative border border-[#e5e7eb] dark:border-[#333333] my-4 sm:my-8 transition-transform animate-in fade-in zoom-in duration-300">
-            
+
             <div class="p-5 sm:p-10">
               <div class="flex justify-between items-center mb-8">
                 <div>
@@ -161,9 +256,22 @@
                   </h2>
                   <p class="text-sm text-[#666666] dark:text-[#999999] mt-1">Completa los datos necesarios abajo.</p>
                 </div>
-                <button (click)="showModal.set(false)" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-[#999999] hover:text-red-500 transition-all">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+                <div class="flex items-center gap-3">
+                  @if (editingArrangement() && (editingArrangement()!.type === 'incoming' || editingArrangement()!.type === 'outgoing')) {
+                    <button
+                      (click)="shareWhatsApp(editingArrangement()!)"
+                      class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-green-50 dark:hover:bg-green-900/20 text-green-600 hover:text-green-700 transition-all"
+                      title="Enviar mensaje de WhatsApp"
+                    >
+                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                      </svg>
+                    </button>
+                  }
+                  <button (click)="showModal.set(false)" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-[#999999] hover:text-red-500 transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
               </div>
 
               @if (validationError()) {

@@ -25,9 +25,9 @@ import { SONGS_DATA } from '../../core/data/song-data';
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    FormsModule, 
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
     RouterModule,
     AdminNavbarComponent,
     AdminLoginComponent,
@@ -47,7 +47,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private conferenceService = inject(ConferenceService);
   private fb = inject(FormBuilder);
   public themeService = inject(ThemeService);
- 
+
   private isProcessing = false;
 
   // Signals for Data from Firebase
@@ -61,27 +61,29 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   showModal = signal(false);
   searchTerm = signal('');
   filterType = signal<'all' | 'incoming' | 'outgoing' | 'event'>('all');
+  timeFilter = signal<'all' | 'upcoming' | 'past'>('all');
   sortOrder = signal<'asc' | 'desc'>('asc');
+  weekendsToShow = signal(6);
 
   // Editing state
   editingArrangement = signal<Arrangement | null>(null);
   editingSpeaker = signal<Speaker | null>(null);
   editingNeighbor = signal<NeighborCongregation | null>(null);
   editingTitle = signal<ConferenceTitle | null>(null);
-  
+
   arrangementForm: FormGroup;
   speakerForm: FormGroup;
   neighborForm: FormGroup;
   titleForm: FormGroup;
-  
+
   // New Workflow Signals
   selectedCongreFilter = signal<string>('');
   arrangementType = signal<'incoming' | 'outgoing' | 'event'>('incoming');
-  
+
   // Authentication Signal
   isAuthorized = signal(false);
   adminPassword = '';
-  
+
   validationError = signal('');
   isSaving = signal(false);
 
@@ -184,21 +186,28 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     labelCtrl?.updateValueAndValidity();
   }
 
-  // --- Computed Properties ---
+  // Computed Properties
 
   filteredArrangements = computed(() => {
     const search = this.searchTerm().toLowerCase();
     const type = this.filterType();
+    const time = this.timeFilter();
     const sort = this.sortOrder();
+    const today = new Date().toISOString().split('T')[0];
 
     let filtered = this._arrangements().filter(arr => {
-      const matchesSearch = !search || 
+      const matchesSearch = !search ||
         arr.speakerName?.toLowerCase().includes(search) ||
         arr.conferenceTitle.toLowerCase().includes(search) ||
         arr.speakerCongregation?.toLowerCase().includes(search);
-      
+
       const matchesType = type === 'all' || arr.type === type;
-      return matchesSearch && matchesType;
+
+      const matchesTime = time === 'all' ||
+        (time === 'upcoming' && arr.date >= today) ||
+        (time === 'past' && arr.date < today);
+
+      return matchesSearch && matchesType && matchesTime;
     });
 
     return filtered.sort((a, b) => {
@@ -208,11 +217,79 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   });
 
+  freeWeekends = computed(() => {
+    const arrangements = this._arrangements();
+    const freeWeekends: Date[] = [];
+    const today = new Date();
+
+    // Buscar los próximos 12 fines de semana
+    for (let i = 0; i < 12; i++) {
+      const saturday = new Date(today);
+      saturday.setDate(today.getDate() + (6 - today.getDay() + 7 * i)); // Próximo sábado
+
+      const sunday = new Date(saturday);
+      sunday.setDate(saturday.getDate() + 1); // Domingo siguiente
+
+      // Verificar si hay arreglos en sábado o domingo
+      const hasArrangement = arrangements.some(arr => {
+        const arrDate = new Date(arr.date);
+        return arrDate.toDateString() === saturday.toDateString() ||
+               arrDate.toDateString() === sunday.toDateString();
+      });
+
+      if (!hasArrangement) {
+        freeWeekends.push(new Date(saturday));
+      }
+    }
+
+    return freeWeekends.slice(0, 6); // Mostrar solo los próximos 6
+  });
+
+  upcomingWeekends = computed(() => {
+    const arrangements = this._arrangements();
+    const weekends: { saturday: Date; sunday: Date; hasArrangement: boolean; arrangements: Arrangement[] }[] = [];
+    const today = new Date();
+
+    // Buscar los próximos fines de semana según el límite configurado
+    for (let i = 0; i < this.weekendsToShow(); i++) {
+      const saturday = new Date(today);
+      saturday.setDate(today.getDate() + (6 - today.getDay() + 7 * i)); // Próximo sábado
+
+      const sunday = new Date(saturday);
+      sunday.setDate(saturday.getDate() + 1); // Domingo siguiente
+
+      // Calcular el inicio y fin de la semana (lunes a domingo)
+      const weekStart = new Date(saturday);
+      weekStart.setDate(saturday.getDate() - 5); // Lunes de esa semana
+      const weekEnd = new Date(sunday); // Domingo
+
+      // Encontrar arreglos para esta semana completa (lunes-domingo)
+      const weekendArrangements = arrangements.filter(arr => {
+        const arrDate = new Date(arr.date);
+        return arrDate >= weekStart && arrDate <= weekEnd;
+      });
+
+      // Si hay una visita o evento, la semana está cubierta
+      // Las salidas no cubren la congregación local
+      const hasEvent = weekendArrangements.some(arr => arr.type === 'event');
+      const hasIncoming = weekendArrangements.some(arr => arr.type === 'incoming');
+
+      weekends.push({
+        saturday: new Date(saturday),
+        sunday: new Date(sunday),
+        hasArrangement: hasEvent || hasIncoming,
+        arrangements: weekendArrangements
+      });
+    }
+
+    return weekends;
+  });
+
   // Filtered speakers based on congregation selection
   availableSpeakers = computed(() => {
     const congreName = this.selectedCongreFilter();
     const type = this.arrangementType();
-    
+
     if (type === 'outgoing') {
       // Para salidas, solo mostramos oradores locales
       return this.speakers().filter(s => s.isLocal);
@@ -224,14 +301,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       });
     }
   });
- 
+
   onCongreFilterChange(congre: string) {
     this.selectedCongreFilter.set(congre);
     if (this.arrangementType() === 'outgoing' && congre) {
       this.arrangementForm.patchValue({ location: congre });
     }
   }
- 
+
   // --- Navigation ---
 
   setTab(tab: any) {
@@ -240,6 +317,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   setFilterType(type: any) {
     this.filterType.set(type as 'all' | 'incoming' | 'outgoing' | 'event');
+  }
+
+  setTimeFilter(time: any) {
+    this.timeFilter.set(time as 'all' | 'upcoming' | 'past');
   }
 
   setSortOrder(order: any) {
@@ -252,11 +333,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.editingArrangement.set(null);
     this.selectedCongreFilter.set('');
     this.arrangementType.set('incoming');
-    this.arrangementForm.reset({ 
-      date: '', 
-      time: '19:30', 
+    this.arrangementForm.reset({
+      date: '',
+      time: '19:30',
       type: 'incoming',
-      songNumber: null 
+      songNumber: null
     });
     this.updateValidators('incoming');
     this.showModal.set(true);
@@ -265,7 +346,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   editArrangement(arr: Arrangement) {
     this.editingArrangement.set(arr);
-    this.selectedCongreFilter.set(arr.speakerId ? this.speakers().find(s => s.id === arr.speakerId)?.congregation || '' : '');
+    // For outgoing arrangements, set filter to destination congregation
+    // For incoming, set to speaker's congregation to filter speakers
+    const filterValue = arr.type === 'outgoing' ? arr.location || '' : (arr.speakerId ? this.speakers().find(s => s.id === arr.speakerId)?.congregation || '' : '');
+    this.selectedCongreFilter.set(filterValue);
     this.arrangementType.set(arr.type);
     this.arrangementForm.patchValue({
       date: arr.date,
@@ -288,17 +372,17 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       if (this.arrangementForm.invalid) this.validationError.set('Por favor completa todos los campos requeridos');
       return;
     }
- 
+
     this.isProcessing = true;
     this.isSaving.set(true);
 
     const formVal = this.arrangementForm.getRawValue();
     const speaker = this.speakers().find(s => s.id === formVal.speakerId);
-    
+
     // Ensure we handle conferenceNumber as a number for strict comparison
     const talkNum = formVal.conferenceNumber ? Number(formVal.conferenceNumber) : null;
     const title = this.titles().find(t => t.number === talkNum);
-    
+
     const arrangementData: any = {
       date: formVal.date,
       time: formVal.time,
@@ -492,5 +576,32 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   getSelectedSpeakerTitles(): ConferenceTitle[] {
     const repertoire = this.getSelectedSpeakerRepertoire();
     return this.titles().filter(t => repertoire.includes(t.number));
+  }
+
+  createArrangementForWeekend(saturday: Date) {
+    this.editingArrangement.set(null);
+    this.selectedCongreFilter.set('');
+    this.arrangementType.set('incoming');
+
+    // Dejar la fecha vacía para que el usuario elija el día específico (sábado o domingo)
+    this.arrangementForm.reset({
+      date: '',
+      time: '19:30',
+      type: 'incoming',
+      songNumber: null
+    });
+    this.updateValidators('incoming');
+    this.showModal.set(true);
+    this.validationError.set('');
+  }
+
+  loadMoreWeekends() {
+    this.weekendsToShow.update(current => current + 6);
+  }
+
+  getSundayDate(saturday: Date): Date {
+    const sunday = new Date(saturday);
+    sunday.setDate(saturday.getDate() + 1);
+    return sunday;
   }
 }

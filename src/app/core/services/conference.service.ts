@@ -1,15 +1,15 @@
 import { Injectable, inject } from '@angular/core';
-import { 
-  Firestore, 
-  collection, 
-  collectionData, 
-  doc, 
-  docData, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  orderBy, 
+import {
+  Firestore,
+  collection,
+  collectionData,
+  doc,
+  docData,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
   where,
   setDoc,
   CollectionReference
@@ -47,8 +47,8 @@ export class ConferenceService {
   getNextWeekendArrangement(): Observable<Arrangement | undefined> {
     const today = new Date().toISOString().split('T')[0];
     const q = query(
-      this.arrangementsColl, 
-      where('date', '>=', today), 
+      this.arrangementsColl,
+      where('date', '>=', today),
       where('type', '==', 'incoming'),
       orderBy('date', 'asc')
     );
@@ -148,12 +148,47 @@ export class ConferenceService {
     const details = `Discurso: ${arrangement.conferenceTitle} (#${arrangement.conferenceNumber})${songInfo}\nOrador: ${arrangement.speakerName} (${arrangement.speakerCongregation})`;
     const location = arrangement.location;
     const title = `Conferencia Pública: ${arrangement.speakerName}`;
-    
+
     return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location || '')}`;
   }
 
   generateWhatsAppMessage(arrangement: Arrangement): string {
-    const songInfo = arrangement.songNumber ? `\n🎵 Cántico: ${arrangement.songNumber}` : '';
-    return `Hola, te comparto los datos de la conferencia:\n\n📅 Fecha: ${new Date(arrangement.date).toLocaleDateString()}\n🕒 Hora: ${arrangement.time}\n🎤 Orador: ${arrangement.speakerName}\n🏛 Congr: ${arrangement.speakerCongregation}\n📚 Tema: ${arrangement.conferenceTitle} (#${arrangement.conferenceNumber})${songInfo}\n📍 Lugar: ${arrangement.location}`;
+    const songInfo = arrangement.songNumber ? `\n• Cántico: ${arrangement.songNumber}` : '';
+    const isIncoming = arrangement.type === 'incoming';
+
+    // Mostrar el día específico de la semana junto con la fecha completa
+    // Para conferencias entrantes y salientes, mostrar el sábado (día del fin de semana)
+    const dateObj = new Date(arrangement.date);
+    if (arrangement.type === 'incoming' || arrangement.type === 'outgoing') {
+      dateObj.setDate(dateObj.getDate() + 1); // Mostrar el sábado
+    }
+    const dayName = dateObj.toLocaleDateString('es-ES', { weekday: 'long' });
+    const dateFormatted = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+    const dateInfo = `${dayName} ${dateFormatted}`;
+
+    let location = 'Por confirmar';
+    if (arrangement.type === 'incoming') {
+      location = 'Wheelwright';
+    } else if (arrangement.location) {
+      location = arrangement.location;
+    }
+
+    const personalMessage = isIncoming
+      ? `Te escribo para recordarte que este fin de semana tenés conferencia en Wheelwright.`
+      : `Te escribo para recordarte que este fin de semana tenés conferencia en ${location}.`;
+
+    return `Hola ${arrangement.speakerName},
+
+${personalMessage}
+
+Detalles:
+• Fecha: ${dateInfo}
+• Hora: ${arrangement.time}
+• Tema: ${arrangement.conferenceTitle}${arrangement.conferenceNumber ? ` (#${arrangement.conferenceNumber})` : ''}${songInfo}
+• Lugar: ${location}
+
+Ante cualquier duda o si necesitás algo, quedo a disposición.
+
+------------`;
   }
 }
