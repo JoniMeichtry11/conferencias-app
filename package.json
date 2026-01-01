@@ -29,6 +29,7 @@
     "@angular/router": "^20.1.0",
     "@angular/service-worker": "^20.1.0",
     "@tailwindcss/postcss": "^4.1.18",
+    "chart.js": "^4.5.1",
     "firebase": "^12.7.0",
     "firebase-admin": "^13.6.0",
     "postcss": "^8.5.6",

@@ -175,7 +175,12 @@
         </app-arrangements-table>
       }
 
-      <!-- 2. Speakers Tab -->
+      <!-- 2. Statistics Tab -->
+      @if (activeTab() === 'statistics') {
+        <app-statistics></app-statistics>
+      }
+
+      <!-- 3. Speakers Tab -->
       @if (activeTab() === 'speakers') {
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div>

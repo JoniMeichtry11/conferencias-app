@@ -16,6 +16,7 @@ import { SpeakerFormComponent } from './components/speaker-form';
 import { NeighborFormComponent } from './components/neighbor-form';
 import { TitleFormComponent } from './components/title-form';
 import { AdminTabsComponent } from './components/admin-tabs';
+import { StatisticsComponent } from './components/statistics';
 import { ThemeService } from '../../core/services/theme.service';
 import { ConferenceService } from '../../core/services/conference.service';
 import { FormsModule } from '@angular/forms';
@@ -39,7 +40,8 @@ import { SONGS_DATA } from '../../core/data/song-data';
     SpeakerFormComponent,
     NeighborFormComponent,
     TitleFormComponent,
-    AdminTabsComponent
+    AdminTabsComponent,
+    StatisticsComponent
   ],
   templateUrl: './admin-dashboard.html'
 })
@@ -57,7 +59,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   private _arrangements = toSignal(this.conferenceService.getArrangements(), { initialValue: [] as Arrangement[] });
 
   // UI State Signals
-  activeTab = signal<'arrangements' | 'speakers' | 'neighbors' | 'titles'>('arrangements');
+  activeTab = signal<'arrangements' | 'statistics' | 'speakers' | 'neighbors' | 'titles'>('arrangements');
   showModal = signal(false);
   searchTerm = signal('');
   filterType = signal<'all' | 'incoming' | 'outgoing' | 'event'>('all');
