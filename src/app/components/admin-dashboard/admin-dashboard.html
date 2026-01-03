@@ -5,7 +5,7 @@
 </app-admin-navbar>
 
   <!-- Content -->
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-20">
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-20">
 
     <!-- Login Screen -->
     @if (!isAuthorized()) {
@@ -31,6 +31,211 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
             </svg>
             <span>Nueva Conferencia</span>
+          </button>
+        </div>
+
+        
+        <!-- Mobile View (Roadmap-style) -->
+        <div class="mb-8 block md:hidden">
+          <div class="grid grid-cols-1 gap-4">
+            @for (weekend of upcomingWeekends(); track weekend.saturday) {
+              <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border-2 {{ weekend.hasArrangement ? 'border-green-200 dark:border-green-800' : 'border-red-200 dark:border-red-800' }} p-5 shadow-lg">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 {{ weekend.hasArrangement ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-sm font-black text-[#1a1a1a] dark:text-white">{{ weekend.saturday | date:'d MMM' }} - {{ weekend.sunday | date:'d MMM' }}</span>
+                  </div>
+                  <span class="px-2 py-1 rounded-full text-xs font-bold {{ weekend.hasArrangement ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200' }}">
+                    {{ weekend.hasArrangement ? 'Con Arreglo' : 'Sin Arreglo' }}
+                  </span>
+                </div>
+
+                @if (weekend.arrangements.length > 0) {
+                  <div class="space-y-2">
+                    @for (arr of weekend.arrangements; track arr.id) {
+                      <div (click)="editArrangement(arr)" class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-[#262626] rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors">
+                        <span class="px-2 py-1 rounded-full text-xs font-bold {{ arr.type === 'incoming' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200' : arr.type === 'outgoing' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' }}">
+                          {{ arr.type === 'incoming' ? 'Visita' : arr.type === 'outgoing' ? 'Salida' : 'Evento' }}
+                        </span>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-bold text-[#1a1a1a] dark:text-white truncate">{{ arr.conferenceTitle }}</p>
+                          <p class="text-xs text-[#555555] dark:text-[#aaaaaa]">{{ arr.speakerName }}</p>
+                          <p class="text-xs text-[#777777] dark:text-[#999999]">
+                            @if (arr.type === 'incoming') {
+                              Viene a Wheelwright
+                            } @else if (arr.type === 'outgoing') {
+                              Sale a {{ arr.location || 'Otra congregación' }}
+                            } @else {
+                              {{ arr.location || 'Evento especial' }}
+                            }
+                          </p>
+                        </div>
+                        @if (arr.type === 'incoming' || arr.type === 'outgoing') {
+                          <button
+                            (click)="shareWhatsApp(arr); $event.stopPropagation()"
+                            class="p-2 cursor-pointer rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 text-green-600 hover:text-green-700 transition-all shrink-0"
+                            title="Enviar mensaje de WhatsApp"
+                          >
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                            </svg>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="text-center py-4">
+                    <p class="text-xs text-[#555555] dark:text-[#aaaaaa] mb-3">Sin arreglos programados</p>
+                    <button
+                    (click)="createArrangementForWeekend(weekend.saturday)"
+                      class="flex items-center gap-2 bg-[#0054a6] dark:bg-[#4a9eff] text-white px-4 py-2 rounded-xl font-bold hover:bg-[#003d7a] dark:hover:bg-[#6bb3ff] transition-all text-xs mx-auto"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      Añadir Visita
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+        
+        <!-- Desktop View (Two Tables) -->
+        <div class="hidden md:block mb-8">
+          <div class="grid grid-cols-2 gap-4 lg:gap-8">
+            <!-- Table 1: Visitas -->
+            <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl border border-[#e5e7eb] dark:border-[#333333] shadow-xl overflow-hidden self-start">
+              <div class="bg-[#f8f9fa] dark:bg-[#262626] px-6 py-4 border-b border-[#e5e7eb] dark:border-[#333333] flex justify-between items-center h-[60px]">
+                <h3 class="text-sm font-black text-[#1a1a1a] dark:text-white uppercase tracking-wider">Visitas a la Congregación</h3>
+                <span class="text-[10px] font-bold text-[#555555] dark:text-[#aaaaaa] bg-white dark:bg-[#1a1a1a] px-2 py-1 rounded-md border border-[#e5e7eb] dark:border-[#333333]">ENTRANTES</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead class="bg-[#f8f9fa] dark:bg-[#262626] border-b border-[#e5e7eb] dark:border-[#333333]">
+                    <tr class="h-[50px]">
+                      <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Fecha</th>
+                      <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Orador / Evento</th>
+                      <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Tema / Info</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[#e5e7eb] dark:divide-[#333333]">
+                    @for (weekend of upcomingWeekends(); track weekend.saturday) {
+                      @let incoming = getIncomingArrangement(weekend.arrangements);
+                      <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group h-[85px]" (click)="incoming ? editArrangement(incoming) : createArrangementForWeekend(weekend.saturday)">
+                        <td class="px-6 py-4">
+                          <div class="flex flex-col">
+                            <span class="text-xs font-black text-[#1a1a1a] dark:text-white">{{ weekend.saturday | date:'d MMM' }}</span>
+                            <span class="text-[9px] font-bold text-[#0054a6] dark:text-[#4a9eff] uppercase">{{ weekend.saturday | date:'EEE' }}</span>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4">
+                          @if (incoming) {
+                            <div class="flex flex-col">
+                              <span class="text-sm font-black text-[#1a1a1a] dark:text-white group-hover:text-[#0054a6] dark:group-hover:text-[#4a9eff] transition-colors">
+                                {{ incoming.type === 'event' ? incoming.customLabel : incoming.speakerName }}
+                              </span>
+                              @if (incoming.type === 'incoming') {
+                                <span class="text-[10px] text-[#555555] dark:text-[#aaaaaa] font-medium">{{ incoming.speakerCongregation }}</span>
+                              }
+                            </div>
+                          } @else {
+                            <div class="flex items-center gap-2 text-red-500 bg-red-50 dark:bg-red-900/10 px-3 py-1.5 rounded-xl border border-red-100 dark:border-red-900/30 w-fit">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                              <span class="text-[10px] font-black uppercase tracking-wider">Falta rellenar</span>
+                            </div>
+                          }
+                        </td>
+                        <td class="px-6 py-4">
+                           @if (incoming && incoming.type !== 'event') {
+                              <p class="text-xs text-[#555555] dark:text-[#aaaaaa] line-clamp-2 italic font-medium">{{ incoming.conferenceTitle }}</p>
+                           } @else if (incoming && incoming.type === 'event') {
+                             <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-md">Evento Especial</span>
+                           }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Table 2: Salidas -->
+            <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl border border-[#e5e7eb] dark:border-[#333333] shadow-xl overflow-hidden self-start">
+              <div class="bg-[#f8f9fa] dark:bg-[#262626] px-6 py-4 border-b border-[#e5e7eb] dark:border-[#333333] flex justify-between items-center h-[60px]">
+                <h3 class="text-sm font-black text-[#1a1a1a] dark:text-white uppercase tracking-wider">Quienes Salen</h3>
+                <span class="text-[10px] font-bold text-[#555555] dark:text-[#aaaaaa] bg-white dark:bg-[#1a1a1a] px-2 py-1 rounded-md border border-[#e5e7eb] dark:border-[#333333]">SALIENTES</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead class="bg-[#f8f9fa] dark:bg-[#262626] border-b border-[#e5e7eb] dark:border-[#333333]">
+                    <tr class="h-[50px]">
+                      <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Fecha</th>
+                      <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Orador / Evento</th>
+                      <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#555555] dark:text-[#aaaaaa]">Destino / Info</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[#e5e7eb] dark:divide-[#333333]">
+                    @for (weekend of upcomingWeekends(); track weekend.saturday) {
+                      @let outgoing = getOutgoingArrangement(weekend.arrangements);
+                      <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group h-[85px]" (click)="outgoing ? editArrangement(outgoing) : createOutgoingForWeekend(weekend.saturday)">
+                        <td class="px-6 py-4">
+                          <div class="flex flex-col">
+                            <span class="text-xs font-black text-[#1a1a1a] dark:text-white">{{ weekend.saturday | date:'d MMM' }}</span>
+                            <span class="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase">{{ weekend.saturday | date:'EEE' }}</span>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4">
+                          @if (outgoing) {
+                            <div class="flex flex-col">
+                              <span class="text-sm font-black text-[#1a1a1a] dark:text-white group-hover:text-[#0054a6] dark:group-hover:text-[#4a9eff] transition-colors">
+                                {{ outgoing.type === 'event' ? outgoing.customLabel : outgoing.speakerName }}
+                              </span>
+                              @if (outgoing.type === 'outgoing') {
+                                <span class="text-[10px] text-[#555555] dark:text-[#aaaaaa] font-medium">{{ outgoing.speakerCongregation }}</span>
+                              }
+                            </div>
+                          } @else {
+                            <span class="text-xs text-[#999999] dark:text-[#666666] italic font-medium">Sin salidas</span>
+                          }
+                        </td>
+                        <td class="px-6 py-4">
+                          @if (outgoing) {
+                              <div class="flex items-center gap-1.5">
+                                @if (outgoing.type === 'outgoing') {
+                                  <svg class="w-3.5 h-3.5 text-[#555555] dark:text-[#aaaaaa]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                  <span class="text-xs text-[#555555] dark:text-[#aaaaaa] font-medium line-clamp-1">{{ outgoing.location || 'Pendiente' }}</span>
+                                } @else {
+                                  <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-md">Evento Especial</span>
+                                }
+                              </div>
+                           } @else {
+                             <span class="text-[10px] text-[#999999]">-</span>
+                           }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ver Más Button -->
+        <div class="flex justify-center mb-8">
+          <button
+            (click)="loadMoreWeekends()"
+            class="flex items-center gap-2.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#0054a6] dark:border-[#4a9eff] text-[#0054a6] dark:text-[#4a9eff] px-6 py-3 rounded-2xl font-black hover:bg-[#0054a6] dark:hover:bg-[#4a9eff] hover:text-white dark:hover:text-white transition-all text-sm"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+            <span>Ver Más Fines de Semana</span>
           </button>
         </div>
 
@@ -82,97 +287,15 @@
             </button>
           </div>
         </div>
-
-        <!-- Próximos Fines de Semana -->
-        <div class="mb-8">
-          <h3 class="text-lg font-black text-[#1a1a1a] dark:text-[#f5f5f5] tracking-tight mb-4">Próximos Fines de Semana</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            @for (weekend of upcomingWeekends(); track weekend.saturday) {
-              <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border-2 {{ weekend.hasArrangement ? 'border-green-200 dark:border-green-800' : 'border-red-200 dark:border-red-800' }} p-5 shadow-lg">
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 {{ weekend.hasArrangement ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span class="text-sm font-black text-[#1a1a1a] dark:text-white">{{ weekend.saturday | date:'d MMM' }} - {{ weekend.sunday | date:'d MMM' }}</span>
-                  </div>
-                  <span class="px-2 py-1 rounded-full text-xs font-bold {{ weekend.hasArrangement ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200' }}">
-                    {{ weekend.hasArrangement ? 'Con Arreglo' : 'Sin Arreglo' }}
-                  </span>
-                </div>
-
-                @if (weekend.hasArrangement) {
-                  <div class="space-y-2">
-                    @for (arr of weekend.arrangements; track arr.id) {
-                      <div (click)="editArrangement(arr)" class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-[#262626] rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors">
-                        <span class="px-2 py-1 rounded-full text-xs font-bold {{ arr.type === 'incoming' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200' : arr.type === 'outgoing' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' }}">
-                          {{ arr.type === 'incoming' ? 'Visita' : arr.type === 'outgoing' ? 'Salida' : 'Evento' }}
-                        </span>
-                        <div class="flex-1 min-w-0">
-                          <p class="text-sm font-bold text-[#1a1a1a] dark:text-white truncate">{{ arr.conferenceTitle }}</p>
-                          <p class="text-xs text-[#555555] dark:text-[#aaaaaa]">{{ arr.speakerName }}</p>
-                          <p class="text-xs text-[#777777] dark:text-[#999999]">
-                            @if (arr.type === 'incoming') {
-                              Viene a Wheelwright
-                            } @else if (arr.type === 'outgoing') {
-                              Sale a {{ arr.location || 'Otra congregación' }}
-                            } @else {
-                              {{ arr.location || 'Evento especial' }}
-                            }
-                          </p>
-                        </div>
-                        @if (arr.type === 'incoming' || arr.type === 'outgoing') {
-                          <button
-                            (click)="shareWhatsApp(arr); $event.stopPropagation()"
-                            class="p-2 cursor-pointer rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 text-green-600 hover:text-green-700 transition-all shrink-0"
-                            title="Enviar mensaje de WhatsApp"
-                          >
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                            </svg>
-                          </button>
-                        }
-                      </div>
-                    }
-                  </div>
-                } @else {
-                  <div class="text-center py-4">
-                    <p class="text-sm text-[#555555] dark:text-[#aaaaaa] mb-3">No hay arreglos programados para este fin de semana</p>
-                    <button
-                      (click)="createArrangementForWeekend(weekend.saturday)"
-                      class="flex items-center gap-2 bg-[#0054a6] dark:bg-[#4a9eff] text-white px-4 py-2 rounded-xl font-bold hover:bg-[#003d7a] dark:hover:bg-[#6bb3ff] transition-all text-sm mx-auto"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                      </svg>
-                      Crear Arreglo
-                    </button>
-                  </div>
-                }
-              </div>
-            }
-          </div>
+        
+        <div class="hidden md:block">
+          <app-arrangements-table
+            [arrangements]="filteredArrangements()"
+            (edit)="editArrangement($event)"
+            (delete)="deleteArrangement($event!)"
+            (whatsapp)="shareWhatsApp($event)">
+          </app-arrangements-table>
         </div>
-
-        <!-- Ver Más Button -->
-        <div class="flex justify-center mb-8">
-          <button
-            (click)="loadMoreWeekends()"
-            class="flex items-center gap-2.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#0054a6] dark:border-[#4a9eff] text-[#0054a6] dark:text-[#4a9eff] px-6 py-3 rounded-2xl font-black hover:bg-[#0054a6] dark:hover:bg-[#4a9eff] hover:text-white dark:hover:text-white transition-all text-sm"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-            <span>Ver Más Fines de Semana</span>
-          </button>
-        </div>
-
-        <app-arrangements-table
-          [arrangements]="filteredArrangements()"
-          (edit)="editArrangement($event)"
-          (delete)="deleteArrangement($event!)"
-          (whatsapp)="shareWhatsApp($event)">
-        </app-arrangements-table>
       }
 
       <!-- 2. Statistics Tab -->

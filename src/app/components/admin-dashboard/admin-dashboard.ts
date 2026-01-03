@@ -601,9 +601,27 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.weekendsToShow.update(current => current + 6);
   }
 
-  getSundayDate(saturday: Date): Date {
-    const sunday = new Date(saturday);
-    sunday.setDate(saturday.getDate() + 1);
-    return sunday;
+  getIncomingArrangement(arrs: Arrangement[]): Arrangement | undefined {
+    return arrs.find(a => a.type === 'incoming' || a.type === 'event');
+  }
+
+  getOutgoingArrangement(arrs: Arrangement[]): Arrangement | undefined {
+    return arrs.find(a => a.type === 'outgoing' || a.type === 'event');
+  }
+
+  createOutgoingForWeekend(saturday: Date) {
+    this.editingArrangement.set(null);
+    this.selectedCongreFilter.set('');
+    this.arrangementType.set('outgoing');
+
+    this.arrangementForm.reset({
+      date: '',
+      time: '19:30',
+      type: 'outgoing',
+      songNumber: null
+    });
+    this.updateValidators('outgoing');
+    this.showModal.set(true);
+    this.validationError.set('');
   }
 }
