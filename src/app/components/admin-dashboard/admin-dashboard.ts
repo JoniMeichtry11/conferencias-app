@@ -251,6 +251,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const arrangements = this._arrangements();
     const weekends: { saturday: Date; sunday: Date; hasArrangement: boolean; arrangements: Arrangement[] }[] = [];
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     // Buscar los próximos fines de semana según el límite configurado
     for (let i = 0; i < this.weekendsToShow(); i++) {
@@ -585,9 +586,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.selectedCongreFilter.set('');
     this.arrangementType.set('incoming');
 
-    // Dejar la fecha vacía para que el usuario elija el día específico (sábado o domingo)
     this.arrangementForm.reset({
-      date: '',
+      date: this.formatDate(saturday),
       time: '19:30',
       type: 'incoming',
       songNumber: null
@@ -615,7 +615,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.arrangementType.set('outgoing');
 
     this.arrangementForm.reset({
-      date: '',
+      date: this.formatDate(saturday),
       time: '19:30',
       type: 'outgoing',
       songNumber: null
@@ -623,5 +623,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.updateValidators('outgoing');
     this.showModal.set(true);
     this.validationError.set('');
+  }
+  private formatDate(date: Date): string {
+    const d = new Date(date);
+    const month = '' + (d.getMonth() + 1);
+    const day = '' + d.getDate();
+    const year = d.getFullYear();
+
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   }
 }
