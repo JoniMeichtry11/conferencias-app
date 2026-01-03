@@ -28,8 +28,13 @@ export class HomeComponent {
 
   // Computed filtered data
   private filteredByMode = computed(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date();
+    // Normalize today to start of day in local time
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    // Si es domingo, ya queremos mostrar lo de la semana siguiente (threshold = mañana)
+    // De lo contrario, mostramos desde hoy (threshold = hoy)
+    const threshold = now.getDay() === 0 ? new Date(today.getTime() + 24 * 60 * 60 * 1000) : today;
     
     return this.allArrangements()
       .filter(a => {
@@ -39,22 +44,32 @@ export class HomeComponent {
         return a.type === 'outgoing';
       })
       .filter(a => {
-        const arrDate = new Date(a.date);
-        arrDate.setHours(0, 0, 0, 0);
-        return arrDate >= today;
+        // Parsear YYYY-MM-DD como fecha local
+        const [year, month, day] = a.date.split('-').map(Number);
+        const arrDate = new Date(year, month - 1, day);
+        return arrDate >= threshold;
       })
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      .sort((a, b) => {
+        const [yA, mA, dA] = a.date.split('-').map(Number);
+        const [yB, mB, dB] = b.date.split('-').map(Number);
+        return new Date(yA, mA - 1, dA).getTime() - new Date(yB, mB - 1, dB).getTime();
+      });
   });
 
   // Computed: End of week boundary
   private endOfWeek = computed(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const currentDay = today.getDay();
-    let daysUntilSaturday = currentDay === 6 ? 0 : (currentDay === 0 ? 6 : 6 - currentDay);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const currentDay = today.getDay(); // 0 (Dom) a 6 (Sab)
+    
+    // Queremos que el límite sea el próximo domingo.
+    // Lunes(1) -> 6 días para el domingo
+    // Sábado(6) -> 1 día para el domingo
+    // Domingo(0) -> Ya queremos ver la semana que viene, así que el límite es el próximo domingo (7 días)
+    let daysUntilSunday = currentDay === 0 ? 7 : (7 - currentDay);
     
     const date = new Date(today);
-    date.setDate(today.getDate() + daysUntilSaturday);
+    date.setDate(today.getDate() + daysUntilSunday);
     date.setHours(23, 59, 59, 999);
     return date;
   });
@@ -62,12 +77,20 @@ export class HomeComponent {
   // Final display signals
   thisWeekArrangements = computed(() => {
     const limit = this.endOfWeek();
-    return this.filteredByMode().filter(a => new Date(a.date) <= limit);
+    return this.filteredByMode().filter(a => {
+      const [year, month, day] = a.date.split('-').map(Number);
+      const arrDate = new Date(year, month - 1, day);
+      return arrDate <= limit;
+    });
   });
 
   futureArrangements = computed(() => {
     const limit = this.endOfWeek();
-    return this.filteredByMode().filter(a => new Date(a.date) > limit);
+    return this.filteredByMode().filter(a => {
+      const [year, month, day] = a.date.split('-').map(Number);
+      const arrDate = new Date(year, month - 1, day);
+      return arrDate > limit;
+    });
   });
 
   setViewMode(mode: 'incoming' | 'outgoing') {
