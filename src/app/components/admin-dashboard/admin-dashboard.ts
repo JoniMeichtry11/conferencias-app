@@ -179,8 +179,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       confNumCtrl?.clearValidators();
       labelCtrl?.setValidators(Validators.required);
     } else {
-      speakerCtrl?.setValidators(Validators.required);
-      confNumCtrl?.setValidators(Validators.required);
+      // Allow empty speaker for TBD
+      speakerCtrl?.clearValidators();
+      confNumCtrl?.clearValidators();
       labelCtrl?.clearValidators();
     }
     speakerCtrl?.updateValueAndValidity();
@@ -391,9 +392,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       time: formVal.time,
       type: formVal.type,
       speakerId: formVal.speakerId || null,
-      speakerName: formVal.type === 'event' ? '' : speaker?.name || '',
-      speakerCongregation: formVal.type === 'event' ? '' : speaker?.congregation || '',
-      conferenceTitle: formVal.type === 'event' ? formVal.customLabel : (title?.title || ''),
+      speakerName: formVal.type === 'event' ? '' : (speaker?.name || 'A Confirmar'),
+      speakerCongregation: formVal.type === 'event' ? '' : (speaker?.congregation || this.selectedCongreFilter() || 'A Confirmar'),
+      conferenceTitle: formVal.type === 'event' ? formVal.customLabel : (title?.title || 'Tema a confirmar'),
       conferenceNumber: talkNum,
       songNumber: formVal.songNumber || null,
       songTitle: formVal.songTitle || '',

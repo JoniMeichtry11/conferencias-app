@@ -45,7 +45,7 @@ import { Speaker, NeighborCongregation, ConferenceTitle } from '../../../core/mo
         <div class="space-y-2">
           <label class="text-[10px] font-black text-[#666666] dark:text-[#999999] uppercase tracking-[0.2em] ml-1">2. Seleccionar Orador</label>
           <select formControlName="speakerId" class="w-full px-5 py-4 bg-[#f8f9fa] dark:bg-[#262626] border-2 border-[#0054a6]/30 dark:border-[#4a9eff]/30 rounded-2xl focus:border-[#0054a6] outline-none transition-all text-sm font-bold appearance-none shadow-sm shadow-blue-500/5 text-[#1a1a1a] dark:text-white">
-            <option value="" class="dark:bg-[#1a1a1a]">{{ availableSpeakers().length ? 'Seleccionar orador...' : 'No hay oradores disponibles' }}</option>
+            <option value="" class="dark:bg-[#1a1a1a]">{{ availableSpeakers().length ? 'Orador a confirmar / Por definir...' : 'No hay oradores disponibles' }}</option>
             @for (s of availableSpeakers(); track s.id) {
               <option [value]="s.id" class="dark:bg-[#1a1a1a]">{{ s.name }} ({{ s.congregation }})</option>
             }

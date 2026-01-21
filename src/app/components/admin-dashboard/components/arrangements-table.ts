@@ -45,7 +45,7 @@ import { Arrangement } from '../../../core/models/conference.models';
               <td class="px-6 py-5">
                 @if (arr.type !== 'event') {
                   <div class="flex flex-col">
-                    <span class="text-sm font-black text-[#1a1a1a] dark:text-white">{{ arr.speakerName }}</span>
+                    <span class="text-sm font-black text-[#1a1a1a] dark:text-white" [class.italic]="arr.speakerName === 'A Confirmar'" [class.opacity-60]="arr.speakerName === 'A Confirmar'">{{ arr.speakerName }}</span>
                     <span class="text-xs text-[#555555] dark:text-[#aaaaaa]">
                       @if (arr.type === 'incoming') {
                         Viene a Wheelwright
