@@ -23,8 +23,8 @@ import { Arrangement } from '../../../core/models/conference.models';
             <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group" [class.opacity-60]="isOldArrangement(arr)">
               <td class="px-6 py-5">
                 <div class="flex flex-col">
-                  <span class="text-[10px] font-bold text-[#0054a6] dark:text-[#4a9eff] uppercase tracking-wider mb-0.5">{{ arr.date | date:'EEE' }}</span>
-                  <span class="text-sm font-black text-[#1a1a1a] dark:text-white">{{ arr.date | date:'d MMM' }}</span>
+                  <span class="text-[10px] font-bold text-[#0054a6] dark:text-[#4a9eff] uppercase tracking-wider mb-0.5">{{ arr.date | date:'EEE':'UTC' }}</span>
+                  <span class="text-sm font-black text-[#1a1a1a] dark:text-white">{{ arr.date | date:'d MMM':'UTC' }}</span>
                   @if (isOldArrangement(arr)) {
                     <span class="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Hace +6 meses</span>
                   }

@@ -24,7 +24,8 @@ export class ConferenceCardComponent {
   }
 
   formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('es-AR', {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString('es-AR', {
       weekday: 'long',
       day: 'numeric',
       month: 'long'

@@ -142,8 +142,21 @@ export class ConferenceService {
   // --- Helpers ---
 
   generateGoogleCalendarUrl(arrangement: Arrangement): string {
-    const start = new Date(arrangement.date).toISOString().replace(/-|:|\.\d\d\d/g, "");
-    const end = new Date(new Date(arrangement.date).getTime() + 60 * 60 * 1000).toISOString().replace(/-|:|\.\d\d\d/g, "");
+    // Combine date and time to create a local Date object
+    // date: "YYYY-MM-DD", time: "HH:mm"
+    const [year, month, day] = arrangement.date.split('-').map(Number);
+    const [hours, minutes] = arrangement.time.split(':').map(Number);
+    
+    const startDate = new Date(year, month - 1, day, hours, minutes);
+    const endDate = new Date(startDate.getTime() + 30 * 60 * 1000); // 30 minutes duration
+    
+    const formatGoogleDate = (date: Date) => {
+      return date.toISOString().replace(/-|:|\.\d\d\d/g, "");
+    };
+
+    const start = formatGoogleDate(startDate);
+    const end = formatGoogleDate(endDate);
+    
     const songInfo = arrangement.songNumber ? `\n🎵 Cántico: ${arrangement.songNumber}` : '';
     const details = `Discurso: ${arrangement.conferenceTitle} (#${arrangement.conferenceNumber})${songInfo}\nOrador: ${arrangement.speakerName} (${arrangement.speakerCongregation})`;
     const location = arrangement.location;
@@ -156,12 +169,10 @@ export class ConferenceService {
     const songInfo = arrangement.songNumber ? `\n• Cántico: ${arrangement.songNumber}` : '';
     const isIncoming = arrangement.type === 'incoming';
 
-    // Mostrar el día específico de la semana junto con la fecha completa
-    // Para conferencias entrantes y salientes, mostrar el sábado (día del fin de semana)
-    const dateObj = new Date(arrangement.date);
-    if (arrangement.type === 'incoming' || arrangement.type === 'outgoing') {
-      dateObj.setDate(dateObj.getDate() + 1); // Mostrar el sábado
-    }
+    // Parse date correctly as local time
+    const [year, month, day] = arrangement.date.split('-').map(Number);
+    const dateObj = new Date(year, month - 1, day);
+    
     const dayName = dateObj.toLocaleDateString('es-ES', { weekday: 'long' });
     const dateFormatted = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
     const dateInfo = `${dayName} ${dateFormatted}`;

@@ -199,10 +199,10 @@ import { Arrangement, Speaker } from '../../../core/models/conference.models';
           <div class="space-y-3">
             @for (activity of recentActivity(); track activity.id) {
               <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-[#262626] rounded-xl">
-                <div class="w-2 h-2 bg-[#0054a6] dark:bg-[#4a9eff] rounded-full mt-2 flex-shrink-0"></div>
+                <div class="w-2 h-2 bg-[#0054a6] dark:bg-[#4a9eff] rounded-full mt-2 shrink-0"></div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-bold text-[#1a1a1a] dark:text-white">{{ activity.title }}</p>
-                  <p class="text-xs text-[#666666] dark:text-[#aaaaaa]">{{ activity.date | date:'d MMM' }} - {{ activity.speaker }}</p>
+                  <p class="text-xs text-[#666666] dark:text-[#aaaaaa]">{{ activity.date | date:'d MMM':'UTC' }} - {{ activity.speaker }}</p>
                 </div>
               </div>
             }
@@ -263,8 +263,10 @@ export class StatisticsComponent {
     const monthlyCounts = new Array(12).fill(0);
 
     arrangements.forEach(arr => {
-      const date = new Date(arr.date);
-      monthlyCounts[date.getMonth()]++;
+      // Parse YYYY-MM-DD as UTC to get correct month
+      const [y, m, d] = arr.date.split('-').map(Number);
+      const date = new Date(Date.UTC(y, m - 1, d));
+      monthlyCounts[date.getUTCMonth()]++;
     });
 
     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -362,8 +364,8 @@ export class StatisticsComponent {
 
   recentActivity = computed(() => {
     const arrangements = this.arrangements();
-    return arrangements
-      .sort((a: Arrangement, b: Arrangement) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    return [...arrangements]
+      .sort((a: Arrangement, b: Arrangement) => b.date.localeCompare(a.date))
       .slice(0, 5)
       .map((arr: Arrangement) => ({
         id: arr.id,
